@@ -1,0 +1,186 @@
+/* ==========================================================================
+   VARIABLES GLOBALES
+   El :root es la raíz de todo. Estas son las "etiquetas" con colores y estilos, aca definimos las variables globales por asi decirlo, las cuales las podemos usar en todo momento mas adelante en el codigo, y si queremos cambiar un color o estilo, solo tenemos que cambiarlo aca y se va a actualizar
+   ========================================================================== */
+
+:root {
+    --fondo-absoluto: #050505; /* Crea un color negro para el fondo de la pantalla */
+    --color-terminal: #00ff41; /* Crea un verde neon */
+    --color-alerta: #ffb000;   /* Crea un color (naranja/amarillo) para los avisos */
+    --borde-panel: 1px solid #00ff41; /* Guarda el estilo de una linea verde finita de 1 px  */
+    --sombra-neon: 0 0 10px rgba(0, 255, 65, 0.2); /* Guarda un efecto de brillo verde muy suave */
+    --sombra-activa: 0 0 15px rgba(0, 255, 65, 0.6); /* Guarda un brillo verde mas fuerte para cuando escribimos */
+}
+
+/* ==========================================================================
+   RESETEO UNIVERSAL 
+   El asterisco (*) lo usamos para decir "aplicale esto a TODAS las etiquetas HTML"
+   ========================================================================== */
+* {
+    box-sizing: border-box; /* Obliga a que los bordes no agranden el tamaño de las cajas */
+    margin: 0; /* Le quita todo el margen (espacio hacia afuera) a todos los elementos */
+    padding: 0; /* Le quita todo el relleno (espacio hacia adentro) a todos los elementos */
+}
+
+/* ==========================================================================
+   CUERPO DE LA PAGINA
+   Aca configuramos el aspecto de toda la pantalla de la compu, osea todo lo que el usuario ve, y ademas lo centramos para que el bunker quede justo en el medio de la pantalla, sin importar el tamaño del monitor o celular
+   ========================================================================== */
+body {
+    background-color: var(--fondo-absoluto); /* Pinta el fondo de toda la web con el negro que creamos arriba */
+    color: var(--color-terminal); /* Pinta todas las letras de color verde neon */
+    font-family: 'Courier New', Courier, monospace; /* Cambia la tipografaia para que parezca maquina de escribir/codigo */
+    height: 100vh; /* Obliga a que la pagina mida exactamente el 100% del alto de la pantalla del usuario */
+    
+    /* En estas lineas centramos el bunker en el medio de la pantalla */
+    display: flex; /* Activa el modo "caja flexible" para poder mover los elementos */
+    justify-content: center; /* Centra el contenido horizontalmente (de izquierda a derecha) */
+    align-items: center; /* Centra el contenido verticalmente (de arriba hacia abajo) */
+}
+
+/* ==========================================================================
+   CONTENEDOR MAESTRO
+   Es la caja gigante que encierra toda nuestra aplicacion
+   ========================================================================== */
+.bunker-container {
+    width: 95%; /* Ocupa el 95% del ancho de la pantalla (deja un bordecito vacio a los lados) */
+    max-width: 1200px; /* Evita que la caja se estire demasiado en monitores muy grandes */
+    min-height: 90vh; /* Asegura que la caja ocupe al menos el 90% del alto de la pantalla */
+    display: flex; /* Activa el modo caja flexible para ordenar lo que hay adentro */
+    flex-direction: column; /* Usamos esto para apilar uno debajo del otro (en columna) */
+    gap: 20px; /* Crea una separacion exacta de 20 px entre el header y los paneles */
+    padding: 20px 0; /* Agrega un espacio interno de 20 px arriba y abajo para que no toque los bordes */
+}
+
+/* ==========================================================================
+   CONSOLA DE ENTRADA
+   Es el encabezado donde el usuario va a escribir la URL y apretar el boton
+   ========================================================================== */
+#consola-input {
+    display: flex; /* Activa la caja flexible para poner el texto, el input y el boton de escaneo */
+    flex-wrap: wrap; /* Si la pantalla es muy chica, permite que los elementos bajen al siguiente renglon */
+    align-items: center; /* Alinea los elementos verticalmente al centro */
+    gap: 15px; /* Separa el texto, la barra de escribir y el boton por 15 px */
+    padding: 20px; /* Le da 20 px de espacio interno a la caja para que los elementos no toquen los bordes */
+    border: var(--borde-panel); /* Dibujamos el borde verde que guardamos en las variables arriba */
+    box-shadow: var(--sombra-neon); /* Le aplica el brillo verde suave alrededor de la caja */
+    background-color: #0a0a0a; /* Pinta el fondo de un gris apenas un poco mas claro que el negro de fondo */
+}
+
+/* Pone en negrita al texto "[TARGET_URL]:" */
+#consola-input label {
+    font-weight: bold; /* Pone la letra mas gruesa */
+}
+
+/* Configuracion de la caja donde el usuario escribe (el input) */
+#consola-input input {
+    flex-grow: 1; /* Hace que la barra de escritura se estire y se coma todo el espacio vacío que sobra en la fila. */
+    background: transparent; /* Hace que el fondo de la barra sea transparente */
+    border: none; /* Le borra los bordes feos que trae por defecto el navegador */
+    border-bottom: 1px solid var(--color-terminal); /* Dibuja la linea verde de abajo de donde va la url */
+    color: inherit; /* Le dice que herede el color de letra (verde) del contenedor padre */
+    font-family: inherit; /* Le dice que use la misma fuente de maquina de escribir */
+    font-size: 1.2rem; /* Agranda un poco el tamaño de la letra que escribe el usuario */
+    outline: none; /* Borra el recuadro azul horrible que aparece por defecto al hacer clic para escribir */
+    padding: 5px; /* Separa apenitas el texto de la linea subrayada */
+    transition: 0.3s; /* Hace que cualquier cambio visual tarde 0.3 segundos (efecto suave) */
+}
+
+/* Efecto al hacer clic para escribir en el input */
+#consola-input input:focus {
+    border-bottom: 2px solid var(--color-terminal); /* Hace que la linea subrayada se ponga mas gruesa */
+    box-shadow: 0px 5px 10px -5px var(--sombra-activa); /* Enciende el brillo fuerte por debajo de la línea */
+}
+
+/* Configuracion del Boton de Escaneo */
+#consola-input button {
+    background-color: var(--color-terminal); /* Pinta el fondo del boton de color verde neon */
+    color: #000; /* Pinta las letras del boton de negro */
+    border: none; /* Le borra el borde por defecto */
+    font-weight: bold; /* Pone las letras en negrita */
+    cursor: pointer; /* Cambia la flechita del mouse por una "manito" de hacer clic cuando pasas por encima */
+    transition: 0.2s; /* Hace que el cambio de color al pasar el mouse sea una animación suave */
+    padding: 10px 20px; /* Lo hace más "gordito" dándole relleno interno (arriba/abajo y lados) */
+    border-radius: 2px; /* Le redondea las puntas apenitas (casi ni se nota, pero queda mejor) */
+}
+
+/* Efecto al pasar el mouse por encima del botón */
+#consola-input button:hover {
+    background-color: var(--color-alerta); /* Cambia el botón al color ámbar/naranja. */
+    box-shadow: 0 0 15px var(--color-alerta); /* Le prende un brillo naranja alrededor. */
+    transform: scale(1.02); /* Agranda el botón un 2% para dar el efecto de que "sale" de la pantalla. */
+}
+
+/* ==========================================================================
+   GRILLA TÁCTICA
+   El contenedor que aloja los 4 paneles de informacion
+   ========================================================================== */
+.paneles-grid {
+    display: grid; /* Cambiamos de flexbox a Grid para armar un tablero bidimensional (filas y columnas) */
+    grid-template-columns: 1fr 1fr; /* Crea 2 columnas exactamente iguales (50% y 50% de la pantalla) */
+    grid-template-rows: 1fr 1fr; /* Crea 2 filas exactamente iguales (50% y 50% del alto disponible) */
+    gap: 15px; /* Crea una separacion de 15 px entre los 4 paneles para que no se peguen */
+    flex-grow: 1; /* Hace que la grilla entera se estire para ocupar todo el alto que sobró debajo de la consola */
+}
+
+/* ==========================================================================
+   DISEÑO DE CADA PANEL
+   Este diseño lo aplicamos a los 4 paneles
+   ========================================================================== */
+.panel-bunker {
+    background-color: var(--fondo-absoluto); /* Fondo negro para cada caja */
+    border: var(--borde-panel); /* Borde verde fino alrededor de cada caja */
+    box-shadow: var(--sombra-neon); /* Brillo verde sutil en cada caja */
+    display: flex; /* Prende Flexbox aca adentro para ordenar el titulo y el contenido */
+    flex-direction: column; /* Apila el titulo arriba y el contenido abajo */
+}
+
+/* Diseño de cada titulo de los paneles */
+.panel-titulo {
+    border-bottom: 1px dashed var(--color-terminal); /* Dibuja una linea de puntitos verdes debajo del titulo */
+    padding: 10px; /* Le da una separacion interna para que el texto no toque la linea de puntitos */
+    margin-bottom: 5px; /* Empuja el contenido de abajo (los datos) a 5 px de distancia */
+    background-color: rgba(0, 255, 65, 0.05); /* Pinta el fondito del titulo con un verde transparente */
+}
+
+/* ==========================================================================
+   CONTROL DE LOS DATOS Y EL SCROLL
+   Donde el robot va a poner la informacion
+   ========================================================================== */
+.contenido-panel {
+    padding: 15px; /* Le da un buen margen interno para que la lectura de datos sea comoda */
+    line-height: 1.6; /* Aumenta el espacio entre cada renglon de texto para que no quede todo apretado */
+}
+
+/* Clase protectora: evita que la pagina se rompa si hay mil enlaces (Overflow) */
+.scroll-activo {
+    overflow-y: auto; /* Le dice al navegador: "Si el texto es muy largo, cortalo y poné una barra deslizable vertical" */
+    max-height: calc(100% - 10px); /* Evita matematicamente que la caja de texto se pase de su limite */
+}
+
+/* Personalizacion de la la scrollbar */
+::-webkit-scrollbar {
+    width: 6px; /* Hace que la barra de scroll sea finita */
+}
+::-webkit-scrollbar-track {
+    background: #111; /* Pinta la barra de un gris muy oscuro */
+}
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-terminal); /* Pinta el cuadradito que se mueve con el mouse de color verde */
+    border-radius: 10px; /* Redondea el cuadradito del scroll */
+}
+
+/* ==========================================================================
+   ADAPTABILIDAD PARA CELULARES
+   Esto dice: "Si la pantalla mide 768 pixeles o menos, cambia lo siguiente"
+   ========================================================================== */
+@media (max-width: 768px) {
+    .paneles-grid {
+        grid-template-columns: 1fr; /* Rompe las 2 columnas y pone todo en 1 sola columna */
+        grid-template-rows: auto; /* Deja que el alto de cada fila se acomode solo al texto */
+    }
+    
+    .panel-bunker {
+        min-height: 250px; /* Evita que en un celular los paneles se encimen */
+    }
+}

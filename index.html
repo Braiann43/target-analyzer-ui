@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="bunker-container">
+
+        <header id="consola-input">
+            <label for="url-input" class="prompt-text">[TARGET_URL]:</label>
+            <input type="url" id="url-input" placeholder="https://">
+            <button id="btn-scan">[INICIAR_ESCANEO]</button>
+        </header>
+
+        <main class="paneles-grid">
+
+            <section class="panel-bunker" id="panel-vista">
+                <h2 class="panel-titulo">PANEL 1: [VISTA]</h2>
+                <div class="contenido-panel">Esperando objetivo ... </div>
+            </section>
+
+            <section class="panel-bunker" id="panel-tech">
+                <h2 class="panel-titulo">PANEL 2: [TECNOLOGÍAS]</h2>
+                <div class="contenido-panel">Esperando objetivo ... </div>
+            </section>
+
+            <section class="panel-bunker" id="panel-enlaces">
+                <h2 class="panel-titulo">PANEL 3: [ENLACES]</h2>
+                <div class="contenido-panel scroll-activo">Esperando objetivo ... </div>
+            </section>
+
+            <section class="panel-bunker" id="panel-metricas">
+                <h2 class="panel-titulo">PANEL 4: [MÉTRICAS]</h2>
+                <div class="contenido-panel">Esperando objetivo ... </div>
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+</html>
