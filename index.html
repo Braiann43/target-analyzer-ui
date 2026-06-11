@@ -8,34 +8,40 @@
 </head>
 <body>
 
-    <div class="bunker-container">
+    <div class="bunker-container"> <!-- Envuelve toda la aplicacion, sirve para (centrado, fondo, margin, etc)-->
 
-        <header id="consola-input">
-            <label for="url-input" class="prompt-text">[TARGET_URL]:</label>
-            <input type="url" id="url-input" placeholder="https://">
+        <header id="consola-input"> <!-- Es la barra de control donde el usuario ingresa la URL -->
+            <label for="url-input" class="prompt-text">[TARGET_URL]:</label> <!-- Etiqueta descriptiva del campo de texto -->
+            <input type="url" id="url-input" placeholder="https://"> <!-- Input para ingresar la URL del objetivo -->
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
         </header>
 
-        <main class="paneles-grid">
+        <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->
 
-            <section class="panel-bunker" id="panel-vista">
-                <h2 class="panel-titulo">PANEL 1: [VISTA]</h2>
-                <div class="contenido-panel">Esperando objetivo ... </div>
+            <!-- Aca utilizamos la clase "panel-bunker" para aplicar estilos comunes a todos los paneles, y cada panel tiene un ID unico para su contenido especifico, y la class "contenido-panel" para el contenido interno, que se presentara desde JavaScript -->
+
+            <section class="panel-bunker" id="panel-vista">   
+                <h2 class="panel-titulo">PANEL 1: [VISTA]</h2>   
+                <div class="contenido-panel">Esperando objetivo ... </div> 
+                <!-- Aca se mostrara la vista/screenshot de la web scrapeada -->
             </section>
 
             <section class="panel-bunker" id="panel-tech">
                 <h2 class="panel-titulo">PANEL 2: [TECNOLOGÍAS]</h2>
                 <div class="contenido-panel">Esperando objetivo ... </div>
+                <!-- Aca se mostraran las tecnologias detectadas en la web objetivo (frameworks, librerías, servidor, etc) Una vez que Node.js analice los headers y el HTML -->
             </section>
 
             <section class="panel-bunker" id="panel-enlaces">
                 <h2 class="panel-titulo">PANEL 3: [ENLACES]</h2>
                 <div class="contenido-panel scroll-activo">Esperando objetivo ... </div>
+                <!-- Aca se mostraran los enlaces encontrados en la web objetivo, solo que con un scroll activo para manejar grandes cantidades de enlaces -->
             </section>
 
             <section class="panel-bunker" id="panel-metricas">
                 <h2 class="panel-titulo">PANEL 4: [MÉTRICAS]</h2>
                 <div class="contenido-panel">Esperando objetivo ... </div>
+                <!-- Aca se mostraran las metricas (cantidad de imagenes, peso de la pagina, tiempo de carga, cantidad de scripts, etc) -->
             </section>
 
         </main>
