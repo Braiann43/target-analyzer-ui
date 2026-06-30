@@ -11,9 +11,10 @@
     <div class="bunker-container"> <!-- Envuelve toda la aplicacion, sirve para (centrado, fondo, margin, etc)-->
 
         <header id="consola-input"> <!-- Es la barra de control donde el usuario ingresa la URL -->
-            <label for="url-input" class="prompt-text">[TARGET_URL]:</label> <!-- Etiqueta descriptiva del campo de texto -->
-            <input type="url" id="url-input" placeholder="https://"> <!-- Input para ingresar la URL del objetivo -->
+            <label for="target-url" class="prompt-text">[TARGET_URL]:</label> <!-- Etiqueta descriptiva del campo de texto -->
+            <input type="text" id="target-url" placeholder="https://" autocomplete="off"> <!-- Input para ingresar la URL del objetivo, autocomplete ="off" desactiva el historial del navegador -->
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
+            <button id="btn-abortar">[ABORTAR_MISIÓN]</button>
         </header>
 
         <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->
@@ -29,7 +30,7 @@
             <section class="panel-bunker" id="panel-tech">
                 <h2 class="panel-titulo">PANEL 2: [TECNOLOGÍAS]</h2>
                 <div class="contenido-panel">Esperando objetivo ... </div>
-                <!-- Aca se mostraran las tecnologias detectadas en la web objetivo (frameworks, librerías, servidor, etc) Una vez que Node.js analice los headers y el HTML -->
+                <!-- Aca se mostraran las tecnologias detectadas en la web objetivo (frameworks, librerias, servidor, etc) Una vez que Node.js analice los headers y el HTML -->
             </section>
 
             <section class="panel-bunker" id="panel-enlaces">
@@ -43,10 +44,9 @@
                 <div class="contenido-panel">Esperando objetivo ... </div>
                 <!-- Aca se mostraran las metricas (cantidad de imagenes, peso de la pagina, tiempo de carga, cantidad de scripts, etc) -->
             </section>
-
-        </main>
-
+    
+        </main>    
     </div>
-
+    <script src="script.js"></script>
 </body>
 </html>
