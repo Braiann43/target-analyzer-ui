@@ -6,12 +6,10 @@
 :root {
     --fondo-absoluto: #050505; /* Crea un color negro para el fondo de la pantalla */
     --color-terminal: #00ff41; /* Crea un verde neon */
-    --color-alerta: #ffb000;   /* Crea un color (naranja/amarillo) para los avisos */
+    --color-alerta: #f2ff00;   /* Crea un color (naranja/amarillo) para los avisos */
     --borde-panel: 1px solid #00ff41; /* Guarda el estilo de una linea verde finita de 1 px  */
     --sombra-neon: 0 0 10px rgba(0, 255, 65, 0.2); /* Guarda un efecto de brillo verde muy suave */
     --sombra-activa: 0 0 15px rgba(0, 255, 65, 0.6); /* Guarda un brillo verde mas fuerte para cuando escribimos */
-    --color-peligro: #ff0033; /* Rojo neón para abortar */
-    --sombra-peligro: 0 0 15px rgba(255, 0, 51, 0.6);
 }
 
 /* ==========================================================================
@@ -171,23 +169,6 @@ body {
     background-color: var(--color-terminal); /* Pinta el cuadradito que se mueve con el mouse de color verde */
     border-radius: 10px; /* Redondea el cuadradito del scroll */
 }
-/* Botón de abortar */
-#btn-abortar {
-    background-color: transparent;
-    color: var(--color-peligro);
-    border: 1px solid var(--color-peligro);
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-    padding: 10px 20px;
-    display: none;
-}
-
-#btn-abortar:hover {
-    background-color: var(--color-peligro);
-    color: #000000;
-    box-shadow: var(--sombra-peligro);
-}
 
 /* ==========================================================================
    ADAPTABILIDAD PARA CELULARES
@@ -202,4 +183,60 @@ body {
     .panel-bunker {
         min-height: 250px; /* Evita que en un celular los paneles se encimen */
     }
+}
+
+/* ==========================================================================
+   FONDO MATRIX
+   El canvas que dibuja la lluvia de caracteres cayendo detras de todo
+   ========================================================================== */
+#matrix-rain {
+    position: fixed; /* Lo clava en la pantalla para que no se mueva al hacer scroll */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Lo manda atras de todo el contenido, para que quede de fondo */
+    opacity: 0.35; /* Lo apaga un poco para que no moleste la lectura de los paneles */
+}
+
+.esperando::after {
+    content: '';
+    animation: tipeo-espera 3s steps(1) infinite;
+}
+
+.esperando::after {
+    content: '';
+    animation: tipeo-espera 4s steps(1) infinite;
+}
+
+@keyframes tipeo-espera {
+    /* Tipeo letra por letra de "Esperando objetivo" */
+    0%   { content: 'E'; }
+    4%   { content: 'Es'; }
+    8%   { content: 'Esp'; }
+    12%  { content: 'Espe'; }
+    16%  { content: 'Esper'; }
+    20%  { content: 'Espera'; }
+    24%  { content: 'Esperan'; }
+    28%  { content: 'Esperand'; }
+    32%  { content: 'Esperando'; }
+    36%  { content: 'Esperando '; }
+    40%  { content: 'Esperando o'; }
+    44%  { content: 'Esperando ob'; }
+    48%  { content: 'Esperando obj'; }
+    52%  { content: 'Esperando obje'; }
+    56%  { content: 'Esperando objet'; }
+    60%  { content: 'Esperando objeti'; }
+    64%  { content: 'Esperando objetiv'; }
+    68%  { content: 'Esperando objetivo'; }
+
+    /* Frase ya completa: ahora ciclan los puntitos */
+    72%  { content: 'Esperando objetivo'; }
+    78%  { content: 'Esperando objetivo.'; }
+    84%  { content: 'Esperando objetivo..'; }
+    90%  { content: 'Esperando objetivo...'; }
+
+    /* Pausa final con todo escrito, antes de reiniciar */
+    96%  { content: 'Esperando objetivo...'; }
+    100% { content: ''; }
 }
