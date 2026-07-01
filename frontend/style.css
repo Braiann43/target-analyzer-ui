@@ -127,38 +127,40 @@ body {
 
 /* ==========================================================================
    SELECTOR DE COLOR (personalización del tema)
-   El cuadradito donde el usuario elige el color de toda la interfaz
+   El cuadradito donde el usuario elige el color de toda la interfaz.
+   Usamos un "marco" de tamaño fijo con overflow:hidden por afuera, y 
+   agrandamos el input por adentro para tapar el borde nativo feo del 
+   navegador. Así el cuadradito queda prolijo en Chrome, Edge y Firefox.
    ========================================================================== */
-#color-picker {
-    -webkit-appearance: none; /* Le saca el estilo feo por defecto del navegador */
-    appearance: none;
-    width: 38px; /* Lo hace cuadrado y chiquito */
+.color-picker-marco {
+    width: 38px; /* Tamaño final que se va a ver, fijo pase lo que pase adentro */
     height: 38px;
-    padding: 0;
-    border: var(--borde-panel); /* Usa el mismo borde verde (o el color elegido) que el resto */
-    border-radius: 4px; /* Le redondea apenas las puntas */
-    background: transparent;
-    cursor: pointer; /* Manito de clic */
+    border: var(--borde-panel); /* Usa el mismo borde que el resto de los controles */
+    border-radius: 4px; /* Puntas redondeaditas */
+    overflow: hidden; /* Recorta cualquier borde/padding nativo que el navegador quiera agregarle al input de adentro */
+    cursor: pointer;
     transition: 0.3s; /* Para que el brillo del hover sea suave */
-}
-
-/* Le saca el relleno interno feo que trae Chrome/Edge en el cuadradito de color */
-#color-picker::-webkit-color-swatch-wrapper {
-    padding: 2px;
-}
-#color-picker::-webkit-color-swatch {
-    border: none;
-    border-radius: 2px;
-}
-/* Version Firefox del cuadradito interno */
-#color-picker::-moz-color-swatch {
-    border: none;
-    border-radius: 2px;
+    flex-shrink: 0; /* Evita que la consola lo achique si el espacio queda justo */
 }
 
 /* Brillo al pasar el mouse, igual que el resto de los controles de la consola */
-#color-picker:hover {
+.color-picker-marco:hover {
     box-shadow: var(--sombra-activa);
+}
+
+#color-picker {
+    -webkit-appearance: none; /* Le saca el estilo feo por defecto del navegador */
+    appearance: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    /* Lo agrandamos bastante más que el marco y lo centramos con márgenes 
+       negativos: así, el borde/padding nativo que el navegador le pone al 
+       input queda "por afuera" del marco visible y el overflow:hidden del 
+       padre lo recorta, dejando ver solo el color puro, cuadrado y prolijo */
+    width: 60px;
+    height: 60px;
+    margin: -11px;
 }
 
 /* ==========================================================================
@@ -303,31 +305,7 @@ body {
     96%  { content: 'Esperando objetivo...'; }
     100% { content: ''; }
 }
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-
-.panel-bunker {
-    background-color: var(--fondo-absoluto);
-    border: var(--borde-panel);
-    box-shadow: var(--sombra-neon);
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
-    cursor: pointer;
-    transform-origin: center;
-}
-
-.panel-bunker:hover {
-    transform: scale(1.03);
-    border-color: var(--color-alerta);
-    box-shadow: var(--sombra-activa);
-    z-index: 10;
-}
-
-=======
->>>>>>> 51bbd1577dce853e2f4d8c5d1f9c2eda8d3c1ea1
 /* ==========================================================================
    MODO FOCO (estilo llamada de Discord)
    Se activa con JS cuando el usuario hace clic en un panel.
@@ -339,7 +317,7 @@ body {
 .paneles-grid.modo-foco {
     display: grid;
     grid-template-rows: 1fr 130px; /* Fila 1: la grande y flexible. Fila 2: franja fija de 130px para las chicas */
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales, una por cada ventanita minimizada */
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 columnas iguales. El minmax(0, 1fr) es clave: sin el "0", el contenido de adentro (como el título) puede forzar a una columna a agrandarse más que las otras */
     gap: 15px;
 }
 
@@ -352,6 +330,7 @@ body {
 /* Los otros 3 paneles caen en la fila de abajo, cada uno en su propia columna (como ventanitas separadas) */
 .paneles-grid.modo-foco .panel-minimizado {
     grid-row: 2;
+    min-width: 0; /* Refuerzo extra: sin esto, algunos navegadores igual dejan que el título empuje el ancho de la columna */
     opacity: 0.75; /* Los apaga un poco visualmente, como inactivos */
     overflow: hidden; /* Si el título no entra, lo recorta en vez de romper la ventanita */
 }
@@ -377,36 +356,3 @@ body {
     box-shadow: var(--sombra-activa);
     z-index: 5; /* Para que al agrandarse no quede tapada por las vecinas */
 }
-<<<<<<< HEAD
-=======
-/* ==========================================================================
-   MODO FOCO (estilo llamada de Discord)
-   ========================================================================== */
-
-.paneles-grid.modo-foco {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.paneles-grid.modo-foco .panel-expandido {
-    flex: 1;
-    order: 1;
-}
-
-.paneles-grid.modo-foco .panel-minimizado {
-    flex: 0 0 90px;
-    order: 2;
-    opacity: 0.7;
-}
-
-.paneles-grid.modo-foco .panel-minimizado .contenido-panel {
-    display: none;
-}
-
-.paneles-grid.modo-foco .panel-minimizado:hover {
-    opacity: 1;
-    box-shadow: var(--sombra-activa);
-}
->>>>>>> 8ea912b17cfd2ae6ff6ff0826368bc0a40e1e663
->>>>>>> 51bbd1577dce853e2f4d8c5d1f9c2eda8d3c1ea1

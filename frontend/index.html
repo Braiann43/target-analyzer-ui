@@ -16,7 +16,9 @@
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
             <button id="btn-abortar">[ABORTAR]</button>
             <label for="color-picker" class="prompt-text">[COLOR]:</label> <!-- Etiqueta del selector de color -->
-            <input type="color" id="color-picker" value="#00ff41" title="Elegí el color del tema"> <!-- El usuario elige acá el color de toda la interfaz -->
+            <div class="color-picker-marco"> <!-- Marco fijo que obliga al selector a quedar cuadrado, recortando lo que el navegador quiera desbordar -->
+                <input type="color" id="color-picker" value="#00ff41" title="Elegí el color del tema">
+            </div>
         </header>
 
         <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->
