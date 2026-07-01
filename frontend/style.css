@@ -128,40 +128,36 @@ body {
 
 /* ==========================================================================
    SELECTOR DE COLOR (personalización del tema)
-   El cuadradito donde el usuario elige el color de toda la interfaz.
-   Usamos un "marco" de tamaño fijo con overflow:hidden por afuera, y 
-   agrandamos el input por adentro para tapar el borde nativo feo del 
-   navegador. Así el cuadradito queda prolijo en Chrome, Edge y Firefox.
    ========================================================================== */
 .color-picker-marco {
-    width: 38px; /* Tamaño final que se va a ver, fijo pase lo que pase adentro */
-    height: 38px;
-    border: var(--borde-panel); /* Usa el mismo borde que el resto de los controles */
-    border-radius: 4px; /* Puntas redondeaditas */
-    overflow: hidden; /* Recorta cualquier borde/padding nativo que el navegador quiera agregarle al input de adentro */
+    display: inline-block; /* LA CLAVE: Evita que el marco se estire hacia la derecha */
+    width: 40px; 
+    height: 40px;
+    border: var(--borde-panel); 
+    border-radius: 4px; 
+    overflow: hidden; 
     cursor: pointer;
-    transition: 0.3s; /* Para que el brillo del hover sea suave */
-    flex-shrink: 0; /* Evita que la consola lo achique si el espacio queda justo */
+    transition: 0.3s; 
+    flex-shrink: 0; 
 }
 
-/* Brillo al pasar el mouse, igual que el resto de los controles de la consola */
+/* Brillo al pasar el mouse */
 .color-picker-marco:hover {
     box-shadow: var(--sombra-activa);
 }
 
-#color-picker {
-    -webkit-appearance: none; /* Le saca el estilo feo por defecto del navegador */
+#color-picker-menu {
+    -webkit-appearance: none; 
     appearance: none;
     border: none;
     padding: 0;
     cursor: pointer;
-    /* Lo agrandamos bastante más que el marco y lo centramos con márgenes 
-       negativos: así, el borde/padding nativo que el navegador le pone al 
-       input queda "por afuera" del marco visible y el overflow:hidden del 
-       padre lo recorta, dejando ver solo el color puro, cuadrado y prolijo */
-    width: 60px;
+    /* Hacemos el input más grande que el marco para esconder los bordes nativos */
+    width: 60px; 
     height: 60px;
-    margin: -11px;
+    /* Lo empujamos hacia arriba y la izquierda para que quede centrado en el marco */
+    margin: -10px; 
+    background-color: transparent; 
 }
 
 /* ==========================================================================
@@ -356,4 +352,80 @@ body {
     transform: scale(1.05); /* Se agranda apenas, como las miniaturas de Discord */
     box-shadow: var(--sombra-activa);
     z-index: 5; /* Para que al agrandarse no quede tapada por las vecinas */
+}
+
+/* ==========================================================================
+   MENÚ LATERAL (PANEL DE CONTROL)
+   ========================================================================== */
+#menu-lateral {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Lo esconde fuera de la pantalla por defecto */
+    width: 320px;
+    height: 100vh;
+    background-color: rgba(5, 5, 5, 0.95); /* Fondo oscuro semi-transparente */
+    border-left: var(--borde-panel);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.9);
+    z-index: 100; /* Asegura que pase por encima de los paneles y la matrix */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    transition: right 0.4s ease-in-out; /* Animación suave al abrir/cerrar */
+}
+
+/* Clase que le agregaremos con JS para que el menú entre a la pantalla */
+#menu-lateral.abierto {
+    right: 0;
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#btn-cerrar-menu {
+    background: transparent;
+    color: var(--color-alerta);
+    border: 1px solid var(--color-alerta);
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+#btn-cerrar-menu:hover {
+    background: var(--color-alerta);
+    color: #000;
+}
+
+.menu-seccion h3 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--color-terminal);
+    padding-bottom: 5px;
+}
+
+#lista-historial {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.item-historial {
+    border: var(--borde-panel);
+    padding: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    background-color: rgba(0, 255, 65, 0.05);
+    word-break: break-all;
+    transition: 0.2s;
+}
+
+.item-historial:hover {
+    background-color: var(--color-terminal);
+    color: #000;
+    box-shadow: var(--sombra-neon);
 }

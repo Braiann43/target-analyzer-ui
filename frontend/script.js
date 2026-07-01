@@ -219,6 +219,7 @@ async function iniciarOperacion() {
     // 5 EL DISPARO A LA RED (EL FETCH)
     
     try {
+        await new Promise(resolve => setTimeout(resolve, 400)); // Para darle tiempo a la UI de mostrar "[CONECTANDO SONDAS...]"
         const respuesta = await fetch('http://localhost:3000/api/escanear', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -291,6 +292,8 @@ async function iniciarOperacion() {
         // Inyecta las métricas finales.
         panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
 
+        registrarEnHistorial(urlIngresada, datos);
+
         reproducirSonidoVictoria(); // Sonido de éxito: los 4 paneles ya se llenaron con datos reales
         botonAbortar.style.display = 'none'; // Oculta el botón tras el éxito
 
@@ -300,7 +303,7 @@ async function iniciarOperacion() {
     } catch (error) {
         if (error.name === 'AbortError') {
             // Le agregué "cursor: pointer;" para que el mouse se ponga con la manito y el usuario sepa que puede clickearlo
-            panelVista.innerHTML = `<span style="color: var(--color-alerta); cursor: pointer;" title="Clic para limpiar">[OPERACIÓN CANCELADA POR EL OPERADOR]</span>`;
+            panelVista.innerHTML = `<span style="color: var(--color-alerta); cursor: pointer; display: block; padding: 10px;" title="Clic para limpiar">[OPERACIÓN CANCELADA POR EL OPERADOR]</span>`;
         } else {
             panelVista.innerHTML = `<span style="color: var(--color-alerta); cursor: pointer;" title="Clic para limpiar">[FALLO DE CONEXIÓN CON BÚNKER CENTRAL]</span>`;
             console.error(error); 
@@ -367,13 +370,9 @@ paneles.forEach(panel => {
 
 
 // 10 SELECTOR DE COLOR (personalización del tema)
-// Permite al usuario elegir el color de toda la interfaz a su gusto
+// Ahora apuntamos al nuevo ID que está adentro del menú lateral oculto
+const selectorColor = document.getElementById('color-picker-menu');
 
-const selectorColor = document.getElementById('color-picker');
-
-// Convierte un color hexadecimal (ej: "#00ff41") en sus 3 componentes
-// numéricos R, G, B separados por comas (ej: "0, 255, 65").
-// Esto es lo que necesitan las sombras en rgba() para poder agregarles transparencia.
 function hexARgb(hex) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
@@ -381,33 +380,118 @@ function hexARgb(hex) {
     return `${r}, ${g}, ${b}`;
 }
 
-// Aplica un color nuevo a toda la web, actualizando las variables CSS globales.
 function aplicarColorTema(hex) {
-    // Cambia el color base. Como el resto del CSS (bordes, texto, sombras) 
-    // está armado con var(--color-terminal), todo se actualiza solo, en vivo.
     document.documentElement.style.setProperty('--color-terminal', hex);
-    
-    // Cambia también la version "RGB suelta", que es la que usan las sombras con transparencia.
     document.documentElement.style.setProperty('--color-terminal-rgb', hexARgb(hex));
 
-    // Avisa a la lluvia Matrix de fondo que tiene que repintarse con el color nuevo.
     if (window.actualizarColorMatrix) {
         window.actualizarColorMatrix();
     }
-
-    // Guarda la elección en el navegador, para que la próxima vez que el 
-    // usuario entre a la página, se mantenga el color que eligió.
     localStorage.setItem('colorTema', hex);
 }
 
-// Si el usuario ya había elegido un color en una visita anterior, lo recuperamos al cargar la página.
+// Recupera el color si el usuario ya había elegido uno antes
 const colorGuardado = localStorage.getItem('colorTema');
 if (colorGuardado) {
     aplicarColorTema(colorGuardado);
-    selectorColor.value = colorGuardado; // Sincroniza el cuadradito de color con el valor guardado
+    // Verificamos que el selector exista antes de asignarle el valor para evitar errores
+    if (selectorColor) {
+        selectorColor.value = colorGuardado; 
+    }
 }
 
-// Cada vez que el usuario mueve el selector y elige un color nuevo, lo aplicamos al instante.
-selectorColor.addEventListener('input', (evento) => {
-    aplicarColorTema(evento.target.value);
+// Escucha los cambios en vivo del nuevo selector de color del menú
+if (selectorColor) {
+    selectorColor.addEventListener('input', (evento) => {
+        aplicarColorTema(evento.target.value);
+    });
+}
+
+// ==========================================================================
+// 11 MENÚ LATERAL Y SISTEMA DE HISTORIAL (CON MEMORIA PERMANENTE)
+// ==========================================================================
+
+const menuLateral = document.getElementById('menu-lateral');
+const btnMenu = document.getElementById('btn-menu');
+const btnCerrarMenu = document.getElementById('btn-cerrar-menu');
+const listaHistorial = document.getElementById('lista-historial');
+
+// Recuperamos el historial guardado en el navegador. Si no hay nada, arranca vacío.
+let historialEscaneos = JSON.parse(localStorage.getItem('historialBunker')) || []; 
+
+// Abrir y cerrar menú
+btnMenu.addEventListener('click', () => {
+    menuLateral.classList.add('abierto');
 });
+btnCerrarMenu.addEventListener('click', () => {
+    menuLateral.classList.remove('abierto');
+});
+
+// Función para guardar un escaneo exitoso y persistirlo
+function registrarEnHistorial(url, datos) {
+    // Verificamos que la URL no esté ya en el historial
+    const yaExiste = historialEscaneos.some(item => item.url === url);
+    if (!yaExiste) {
+        historialEscaneos.unshift({ url, datos }); 
+        // Guardamos la lista actualizada en el disco duro del navegador
+        localStorage.setItem('historialBunker', JSON.stringify(historialEscaneos));
+        actualizarVisorHistorial();
+    }
+}
+
+// Renderiza los botones en el menú lateral
+function actualizarVisorHistorial() {
+    listaHistorial.innerHTML = ''; // Limpia la lista actual
+
+    // Si el historial está vacío, mostramos el mensaje por defecto
+    if (historialEscaneos.length === 0) {
+        listaHistorial.innerHTML = '<li style="color: var(--color-terminal); opacity: 0.5;">[HISTORIAL VACÍO]</li>';
+        return;
+    }
+
+    historialEscaneos.forEach((item) => {
+        const li = document.createElement('li');
+        li.className = 'item-historial';
+        li.innerHTML = `> ${item.url}`;
+        
+        // Al hacer clic en un registro viejo, lo carga de los datos guardados
+        li.addEventListener('click', () => {
+            menuLateral.classList.remove('abierto'); // Cierra el menú
+            cargarDatosDesdeMemoria(item.url, item.datos); // Dispara la inyección
+        });
+        
+        listaHistorial.appendChild(li);
+    });
+}
+
+// Cargamos y pintamos el historial apenas se abre la página
+actualizarVisorHistorial();
+
+// Esta función recicla tu lógica visual, pero extrae los datos de la memoria en lugar de un Fetch
+async function cargarDatosDesdeMemoria(urlIngresada, datos) {
+    reproducirSonidoInicioEscaneo();
+    panelVista.classList.remove('esperando');
+    panelTech.classList.remove('esperando');
+    panelEnlaces.classList.remove('esperando');
+    panelMetricas.classList.remove('esperando');
+
+    panelVista.innerHTML = `<span style="color: var(--color-terminal)">[RESTAURANDO DATOS DESDE ARCHIVO LOCAL...]</span>`;
+    panelTech.innerHTML = '';
+    panelEnlaces.innerHTML = '';
+    panelMetricas.innerHTML = '';
+    inputObjetivo.value = urlIngresada; 
+
+    await new Promise(resolve => setTimeout(resolve, 300)); 
+
+    const tituloRecortado = datos.identidad.titulo.length > 50 ? datos.identidad.titulo.substring(0, 47) + '...' : datos.identidad.titulo;
+    const descripcionRecortada = datos.identidad.descripcion.length > 80 ? datos.identidad.descripcion.substring(0, 77) + '...' : datos.identidad.descripcion;
+    
+    panelVista.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>TÍTULO: <span style="color: var(--color-terminal)">${tituloRecortado}</span></li><li style="margin-top: 5px;">DESCRIPCIÓN: <span style="color: var(--color-terminal)">${descripcionRecortada}</span></li></ul>`;
+    panelTech.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>SERVIDOR: <span style="color: var(--color-terminal)">${datos.tecnologias.servidor}</span></li><li>LENGUAJE: <span style="color: var(--color-terminal)">${datos.tecnologias.lenguaje}</span></li><li>FRONTEND: <span style="color: var(--color-terminal)">${datos.tecnologias.frameworkFront}</span></li></ul>`;
+    panelEnlaces.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>RUTAS BASE: <span style="color: var(--color-terminal)">${urlIngresada}</span></li><li style="margin-top: 10px; color: var(--color-alerta)">[MÓDULO DE MAPEO ITERATIVO: OFFLINE]</li><li style="color: var(--color-alerta)">[ESPERANDO ACTUALIZACIÓN DEL ROBOT...]</li></ul>`;
+    
+    const estadoSsl = datos.metricas.certSslVigente ? "Seguro (Activo)" : "Vulnerable (Caído)";
+    panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
+
+    reproducirSonidoVictoria();
+}
