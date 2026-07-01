@@ -332,7 +332,7 @@ async function iniciarOperacion() {
 
 
 // 9 MODO FOCO (estilo llamada de Discord)
-// Al hacer clic en un panel, ese se agranda y los otros 3 se minimizan abajo.
+// Al hacer clic en un panel, ese se agranda y los otros 3 se minimizan  abajo.
 
 // Agarramos TODOS los paneles de una sola vez
 const paneles = document.querySelectorAll('.panel-bunker');
