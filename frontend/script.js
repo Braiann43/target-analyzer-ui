@@ -129,6 +129,95 @@ function reproducirSonidoAbortar() {
 }
 
 
+// 2.2 SPINNER ASCII (indicador de actividad mientras esperamos al backend)
+// En vez de un gif o una imagen de "cargando", usamos el recurso mas viejo y
+// mas hacker que existe: un caracter que gira sobre si mismo tipo terminal de
+// los 90 ('|', '/', '-', '\'). Es cero peso, cero dependencias, y pega
+// perfecto con la estetica de consola de toda la web.
+
+// Guarda la funcion que apaga el spinner que esta activo en este momento.
+// La dejamos "colgada" a nivel de archivo para que cualquier rama del codigo
+// (exito, error del backend, o corte de conexion) pueda apagarla sin
+// importar en que parte de iniciarOperacion() estemos.
+let detenerSpinnerActual = null;
+
+// Prende el spinner sobre un elemento del DOM y devuelve una funcion para
+// apagarlo. Si no se llama a esa funcion, el intervalo queda vivo para
+// siempre "girando en el vacio" (fuga de memoria), asi que SIEMPRE hay que
+// guardarse y ejecutar lo que esta funcion devuelve.
+function iniciarSpinnerAscii(elementoSpinner) {
+    const framesSpinner = ['|', '/', '-', '\\']; // Los 4 cuadros clasicos del spinner de terminal
+    let indiceFrame = 0;
+
+    const intervaloSpinner = setInterval(() => {
+        elementoSpinner.textContent = framesSpinner[indiceFrame % framesSpinner.length];
+        indiceFrame++;
+    }, 120); // Gira cada 120ms: rapido, pero sin marear al ojo humano
+
+    // Devolvemos la "llave" para apagarlo desde afuera
+    return function apagarSpinner() {
+        clearInterval(intervaloSpinner);
+    };
+}
+
+
+// 2.3 EFECTO DE DESENCRIPTACIÓN (revelado tipo "hackeo" de los datos entrantes)
+// Cuando el backend contesta, en vez de tirar el texto posta de una sola vez,
+// lo hacemos "decodificar" en pantalla: arranca como sopa de caracteres random
+// y, de izquierda a derecha, se va fijando letra por letra hasta mostrar el
+// dato real. El clasico efecto "descifrando transmision" de las peliculas de
+// hackers, pero armado a mano con setInterval.
+
+const CARACTERES_CIFRADO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*+=-/\\<>[]{}'; // Sopa de caracteres para el "ruido" inicial
+
+// Recibe un elemento del DOM y el texto final que tiene que terminar mostrando.
+// Va revelando de a una letra (de izquierda a derecha), y mientras tanto rellena
+// el resto con caracteres random que cambian en cada cuadro, como una señal
+// que se va sintonizando.
+function efectoDesencriptado(elementoDestino, textoFinal, velocidadMs = 25) {
+    let letrasReveladas = 0;
+
+    const intervaloDescifrado = setInterval(() => {
+        let textoEnPantalla = '';
+
+        for (let i = 0; i < textoFinal.length; i++) {
+            if (i < letrasReveladas) {
+                // Esta posicion ya esta "descifrada": mostramos la letra real
+                textoEnPantalla += textoFinal[i];
+            } else if (textoFinal[i] === ' ') {
+                // Los espacios los respetamos siempre, si no, el ruido no deja leer las palabras
+                textoEnPantalla += ' ';
+            } else {
+                // Todavia no se descifro: ponemos un caracter random de la sopa
+                textoEnPantalla += CARACTERES_CIFRADO[Math.floor(Math.random() * CARACTERES_CIFRADO.length)];
+            }
+        }
+
+        elementoDestino.textContent = textoEnPantalla;
+        letrasReveladas++;
+
+        // Cuando ya revelamos todas las letras, frenamos el intervalo y dejamos el texto final limpio
+        if (letrasReveladas > textoFinal.length) {
+            clearInterval(intervaloDescifrado);
+            elementoDestino.textContent = textoFinal;
+        }
+    }, velocidadMs);
+}
+
+// Barre un panel entero buscando todos los elementos marcados con la clase
+// "dato-cifrado" (los datos que vinieron posta del servidor) y les aplica el
+// efecto de desencriptado a cada uno. El texto final que van a mostrar es el
+// mismo que ya quedo cargado en el HTML: lo leemos, y lo usamos como "meta"
+// del descifrado.
+function desencriptarPanel(panel, velocidadMs = 25) {
+    const nodosCifrados = panel.querySelectorAll('.dato-cifrado');
+    nodosCifrados.forEach((nodo) => {
+        const textoFinal = nodo.textContent;
+        efectoDesencriptado(nodo, textoFinal, velocidadMs);
+    });
+}
+
+
 // 3 ESCUCHADORES DE EVENTOS (LOS GATILLOS)
 
 // Cuando se hace clic en el botón de escaneo, dispara la función 'iniciarOperacion'.
@@ -207,7 +296,12 @@ async function iniciarOperacion() {
     }
 
     // 4 INYECCIÓN DINÁMICA (Preparacion visual de los paneles para el escaneo)
-    panelVista.innerHTML = '<span style="color: var(--color-terminal)">[CONECTANDO SONDAS...]</span>';
+    // El texto "[CONECTANDO SONDAS...]" ahora viene acompañado de un spinner ASCII
+    // (el clasico '|/-\' de terminal) para que el operador vea que la maquina
+    // sigue viva mientras esperamos respuesta del backend, y no crea que se colgó.
+    panelVista.innerHTML = '<span style="color: var(--color-terminal)">[CONECTANDO SONDAS...] <span id="spinner-carga"></span></span>';
+    const nodoSpinnerCarga = document.getElementById('spinner-carga');
+    detenerSpinnerActual = iniciarSpinnerAscii(nodoSpinnerCarga);
     panelTech.innerHTML = '';
     panelEnlaces.innerHTML = '';
     panelMetricas.innerHTML = '';
@@ -235,6 +329,9 @@ async function iniciarOperacion() {
         // CONTROL DE ERRORES DEL SERVIDOR
         // respuesta.ok verifica si el código HTTP es 200 (éxito). Si el backend manda un código 400 o 500...
         if (!respuesta.ok) {
+            // Frenamos el spinner: la respuesta ya llegó (aunque sea con error), no tiene sentido que siga girando.
+            if (detenerSpinnerActual) { detenerSpinnerActual(); detenerSpinnerActual = null; }
+
             // Muestra el error que mandó el backend y frena la ejecución.
             panelVista.innerHTML = `<span style="color: var(--color-alerta)">[ERROR: ${datos.error}]</span>`;
             panelTech.innerHTML = '';
@@ -253,8 +350,18 @@ async function iniciarOperacion() {
         }
         
         // 6 IMPACTO EN EL TABLERO (Resultados exitosos)
-        panelVista.innerHTML = `<span style="color: var(--color-terminal)">${datos.mensaje}</span>`;
-        panelTech.innerHTML = `<span style="color: var(--color-terminal)">Objetivo en servidor: ${datos.objetivo}</span>`;
+        // La respuesta ya llegó posta: apagamos el spinner de conexión antes de mostrar nada.
+        if (detenerSpinnerActual) { detenerSpinnerActual(); detenerSpinnerActual = null; }
+
+        // La clase "dato-cifrado" marca cada dato REAL que viene del servidor. A cada
+        // uno de esos spans, apenas se inyectan en el panel, se le aplica el efecto
+        // de desencriptado (arranca en sopa de letras random y se va "sintonizando"
+        // hasta mostrar el valor posta). Las etiquetas fijas (TÍTULO:, SERVIDOR:, etc.)
+        // quedan afuera de esa clase: esas no vienen del backend, no hace falta cifrarlas.
+        panelVista.innerHTML = `<span class="dato-cifrado" style="color: var(--color-terminal)">${datos.mensaje}</span>`;
+        desencriptarPanel(panelVista);
+        panelTech.innerHTML = `<span class="dato-cifrado" style="color: var(--color-terminal)">Objetivo en servidor: ${datos.objetivo}</span>`;
+        desencriptarPanel(panelTech);
 
         // PAUSA TÁCTICA: Congela el código 600 milisegundos (0.6 seg) para dar sensación de procesamiento.
         await new Promise(resolve => setTimeout(resolve, 600));
@@ -265,34 +372,39 @@ async function iniciarOperacion() {
         // Hace lo mismo con la descripción, pero el límite son 80 letras.
         const descripcionRecortada = datos.identidad.descripcion.length > 80 ? datos.identidad.descripcion.substring(0, 77) + '...' : datos.identidad.descripcion;
         
-        // Inyecta el título y descripción formateados en HTML.
-        panelVista.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>TÍTULO: <span style="color: var(--color-terminal)">${tituloRecortado}</span></li><li style="margin-top: 5px;">DESCRIPCIÓN: <span style="color: var(--color-terminal)">${descripcionRecortada}</span></li></ul>`;
+        // Inyecta el título y descripción formateados en HTML, y los desencripta apenas entran.
+        panelVista.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>TÍTULO: <span class="dato-cifrado" style="color: var(--color-terminal)">${tituloRecortado}</span></li><li style="margin-top: 5px;">DESCRIPCIÓN: <span class="dato-cifrado" style="color: var(--color-terminal)">${descripcionRecortada}</span></li></ul>`;
+        desencriptarPanel(panelVista);
         
         // Otra pausa de 300ms antes de mostrar el siguiente panel.
         await new Promise(resolve => setTimeout(resolve, 300));
 
-        // PANEL 2 (TECH): Muestra los datos de tecnología que enviará el nuevo backend.
-        panelTech.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>SERVIDOR: <span style="color: var(--color-terminal)">${datos.tecnologias.servidor}</span></li><li>LENGUAJE: <span style="color: var(--color-terminal)">${datos.tecnologias.lenguaje}</span></li><li>FRONTEND: <span style="color: var(--color-terminal)">${datos.tecnologias.frameworkFront}</span></li></ul>`;
+        // PANEL 2 (TECH): Muestra los datos de tecnología que enviará el nuevo backend, desencriptados letra por letra.
+        panelTech.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>SERVIDOR: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.tecnologias.servidor}</span></li><li>LENGUAJE: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.tecnologias.lenguaje}</span></li><li>FRONTEND: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.tecnologias.frameworkFront}</span></li></ul>`;
+        desencriptarPanel(panelTech);
         
         // Última pausa de 300ms.
         await new Promise(resolve => setTimeout(resolve, 300));
 
         // PANEL 3 (ENLACES) (Inyección temporal táctica)
         // Como el Robot 1.1 aún no extrae el arreglo de enlaces internos, 
-        // dejamos la URL anclada y un aviso visual.
+        // dejamos la URL anclada y un aviso visual. Los avisos fijos no se cifran,
+        // solo la URL (que es el único dato real que tenemos por ahora).
         panelEnlaces.innerHTML = `
         <ul style="list-style: none; padding: 0; margin: 0;">
-            <li>RUTAS BASE: <span style="color: var(--color-terminal)">${urlIngresada}</span></li>
+            <li>RUTAS BASE: <span class="dato-cifrado" style="color: var(--color-terminal)">${urlIngresada}</span></li>
             <li style="margin-top: 10px; color: var(--color-alerta)">[MÓDULO DE MAPEO ITERATIVO: OFFLINE]</li>
             <li style="color: var(--color-alerta)">[ESPERANDO ACTUALIZACIÓN DEL ROBOT...]</li>
         </ul>`;
+        desencriptarPanel(panelEnlaces);
 
         // PANEL 4 (METRICAS) EVALUACIÓN LÓGICA EN CLIENTE
         // Si el booleano 'certSslVigente' es true, guarda el texto verde. Si es false, texto de alerta.
         const estadoSsl = datos.metricas.certSslVigente ? "Seguro (Activo)" : "Vulnerable (Caído)";
         
-        // Inyecta las métricas finales.
-        panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
+        // Inyecta las métricas finales, tambien con el efecto de descifrado.
+        panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span class="dato-cifrado" style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
+        desencriptarPanel(panelMetricas);
 
         registrarEnHistorial(urlIngresada, datos);
 
@@ -303,6 +415,9 @@ async function iniciarOperacion() {
     // 8 GESTIÓN DE EXCEPCIONES Y ABORTOS
     
     } catch (error) {
+        // Se cortó la operación (aborto manual o falla de red): el spinner ya no tiene nada que esperar.
+        if (detenerSpinnerActual) { detenerSpinnerActual(); detenerSpinnerActual = null; }
+
         if (error.name === 'AbortError') {
             // Le agregué "cursor: pointer;" para que el mouse se ponga con la manito y el usuario sepa que puede clickearlo
             panelVista.innerHTML = `<span style="color: var(--color-alerta); cursor: pointer; display: block; padding: 10px;" title="Clic para limpiar">[OPERACIÓN CANCELADA POR EL OPERADOR]</span>`;
@@ -543,7 +658,12 @@ async function cargarDatosDesdeMemoria(urlIngresada, datos) {
     panelEnlaces.classList.remove('esperando');
     panelMetricas.classList.remove('esperando');
 
-    panelVista.innerHTML = `<span style="color: var(--color-terminal)">[RESTAURANDO DATOS DESDE ARCHIVO LOCAL...]</span>`;
+    // Mismo spinner ASCII que usa la operación en vivo, para mantener una sola
+    // "identidad visual" de carga en toda la web (venga el dato de un fetch real
+    // o de la memoria local del navegador).
+    panelVista.innerHTML = `<span style="color: var(--color-terminal)">[RESTAURANDO DATOS DESDE ARCHIVO LOCAL...] <span id="spinner-carga"></span></span>`;
+    const nodoSpinnerCarga = document.getElementById('spinner-carga');
+    detenerSpinnerActual = iniciarSpinnerAscii(nodoSpinnerCarga);
     panelTech.innerHTML = '';
     panelEnlaces.innerHTML = '';
     panelMetricas.innerHTML = '';
@@ -551,15 +671,27 @@ async function cargarDatosDesdeMemoria(urlIngresada, datos) {
 
     await new Promise(resolve => setTimeout(resolve, 300)); 
 
+    // Los datos ya están listos para mostrarse: apagamos el spinner antes de inyectarlos.
+    if (detenerSpinnerActual) { detenerSpinnerActual(); detenerSpinnerActual = null; }
+
     const tituloRecortado = datos.identidad.titulo.length > 50 ? datos.identidad.titulo.substring(0, 47) + '...' : datos.identidad.titulo;
     const descripcionRecortada = datos.identidad.descripcion.length > 80 ? datos.identidad.descripcion.substring(0, 77) + '...' : datos.identidad.descripcion;
     
-    panelVista.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>TÍTULO: <span style="color: var(--color-terminal)">${tituloRecortado}</span></li><li style="margin-top: 5px;">DESCRIPCIÓN: <span style="color: var(--color-terminal)">${descripcionRecortada}</span></li></ul>`;
-    panelTech.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>SERVIDOR: <span style="color: var(--color-terminal)">${datos.tecnologias.servidor}</span></li><li>LENGUAJE: <span style="color: var(--color-terminal)">${datos.tecnologias.lenguaje}</span></li><li>FRONTEND: <span style="color: var(--color-terminal)">${datos.tecnologias.frameworkFront}</span></li></ul>`;
-    panelEnlaces.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>RUTAS BASE: <span style="color: var(--color-terminal)">${urlIngresada}</span></li><li style="margin-top: 10px; color: var(--color-alerta)">[MÓDULO DE MAPEO ITERATIVO: OFFLINE]</li><li style="color: var(--color-alerta)">[ESPERANDO ACTUALIZACIÓN DEL ROBOT...]</li></ul>`;
+    // Igual que en el escaneo en vivo, cada dato real lleva la clase "dato-cifrado"
+    // para que se desencripte en pantalla en vez de aparecer de golpe.
+    panelVista.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>TÍTULO: <span class="dato-cifrado" style="color: var(--color-terminal)">${tituloRecortado}</span></li><li style="margin-top: 5px;">DESCRIPCIÓN: <span class="dato-cifrado" style="color: var(--color-terminal)">${descripcionRecortada}</span></li></ul>`;
+    panelTech.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>SERVIDOR: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.tecnologias.servidor}</span></li><li>LENGUAJE: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.tecnologias.lenguaje}</span></li><li>FRONTEND: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.tecnologias.frameworkFront}</span></li></ul>`;
+    panelEnlaces.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>RUTAS BASE: <span class="dato-cifrado" style="color: var(--color-terminal)">${urlIngresada}</span></li><li style="margin-top: 10px; color: var(--color-alerta)">[MÓDULO DE MAPEO ITERATIVO: OFFLINE]</li><li style="color: var(--color-alerta)">[ESPERANDO ACTUALIZACIÓN DEL ROBOT...]</li></ul>`;
     
     const estadoSsl = datos.metricas.certSslVigente ? "Seguro (Activo)" : "Vulnerable (Caído)";
-    panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
+    panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span class="dato-cifrado" style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span class="dato-cifrado" style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
+
+    // Un solo barrido de desencriptado que cubre los 4 paneles a la vez, ya que
+    // acá no hay pausas escalonadas entre panel y panel como en el fetch real.
+    desencriptarPanel(panelVista);
+    desencriptarPanel(panelTech);
+    desencriptarPanel(panelEnlaces);
+    desencriptarPanel(panelMetricas);
 
     reproducirSonidoVictoria();
 }

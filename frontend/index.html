@@ -27,27 +27,75 @@
 
             <!-- Aca utilizamos la clase "panel-bunker" para aplicar estilos comunes a todos los paneles, y cada panel tiene un ID unico para su contenido especifico, y la class "contenido-panel" para el contenido interno, que se presentara desde JavaScript -->
 
-            <section class="panel-bunker" id="panel-vista">   
-                <h2 class="panel-titulo">PANEL 1: [VISTA]</h2>   
-                <div class="contenido-panel esperando"></div>
+            <!-- Cada panel-titulo ahora lleva, ademas del texto, un SVG "tactico" (trazo fino, sin relleno) que
+                 usa stroke="currentColor": asi el icono siempre hereda el verde neon del tema, incluso si el
+                 usuario lo cambia en vivo desde el selector de color del menu lateral. Cero imagenes externas,
+                 cero peso extra: son vectores dibujados a mano, como el resto de la estetica bunker -->
+
+            <section class="panel-bunker" id="panel-vista">
+                <h2 class="panel-titulo">
+                    <svg class="icono-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <!-- Icono de mira/reticula: representa la "vista" u ojo del objetivo -->
+                        <circle cx="12" cy="12" r="8"></circle>
+                        <circle cx="12" cy="12" r="2.2"></circle>
+                        <line x1="12" y1="1" x2="12" y2="5"></line>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="1" y1="12" x2="5" y2="12"></line>
+                        <line x1="19" y1="12" x2="23" y2="12"></line>
+                    </svg>
+                    PANEL 1: [VISTA]
+                </h2>
+                <div class="contenido-panel scroll-activo esperando"></div>
                 <!-- Aca se mostrara la vista/screenshot de la web scrapeada -->
             </section>
 
             <section class="panel-bunker" id="panel-tech">
-                <h2 class="panel-titulo">PANEL 2: [TECNOLOGÍAS]</h2>
-                <div class="contenido-panel esperando"></div>
+                <h2 class="panel-titulo">
+                    <svg class="icono-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <!-- Icono de chip/circuito: representa las tecnologias detectadas -->
+                        <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+                        <rect x="10" y="10" width="4" height="4"></rect>
+                        <line x1="12" y1="1" x2="12" y2="4"></line>
+                        <line x1="12" y1="20" x2="12" y2="23"></line>
+                        <line x1="1" y1="12" x2="4" y2="12"></line>
+                        <line x1="20" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.5" y1="4.5" x2="6.5" y2="6.5"></line>
+                        <line x1="17.5" y1="17.5" x2="19.5" y2="19.5"></line>
+                        <line x1="19.5" y1="4.5" x2="17.5" y2="6.5"></line>
+                        <line x1="6.5" y1="17.5" x2="4.5" y2="19.5"></line>
+                    </svg>
+                    PANEL 2: [TECNOLOGÍAS]
+                </h2>
+                <div class="contenido-panel scroll-activo esperando"></div>
                 <!-- Aca se mostraran las tecnologias detectadas en la web objetivo (frameworks, librerías, servidor, etc) Una vez que Node.js analice los headers y el HTML -->
             </section>
 
             <section class="panel-bunker" id="panel-enlaces">
-                <h2 class="panel-titulo">PANEL 3: [ENLACES]</h2>
+                <h2 class="panel-titulo">
+                    <svg class="icono-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <!-- Icono de cadena/eslabones: representa los enlaces encontrados -->
+                        <rect x="2" y="9" width="9" height="6" rx="3"></rect>
+                        <rect x="13" y="9" width="9" height="6" rx="3"></rect>
+                        <line x1="9" y1="12" x2="15" y2="12"></line>
+                    </svg>
+                    PANEL 3: [ENLACES]
+                </h2>
                 <div class="contenido-panel scroll-activo esperando"></div>
                 <!-- Aca se mostraran los enlaces encontrados en la web objetivo, solo que con un scroll activo para manejar grandes cantidades de enlaces -->
             </section>
 
             <section class="panel-bunker" id="panel-metricas">
-                <h2 class="panel-titulo">PANEL 4: [MÉTRICAS]</h2>
-                <div class="contenido-panel esperando"></div>
+                <h2 class="panel-titulo">
+                    <svg class="icono-panel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <!-- Icono de radar/barras: representa las metricas del escaneo -->
+                        <line x1="4" y1="21" x2="4" y2="13"></line>
+                        <line x1="12" y1="21" x2="12" y2="7"></line>
+                        <line x1="20" y1="21" x2="20" y2="17"></line>
+                        <line x1="2" y1="21" x2="22" y2="21"></line>
+                    </svg>
+                    PANEL 4: [MÉTRICAS]
+                </h2>
+                <div class="contenido-panel scroll-activo esperando"></div>
                 <!-- Aca se mostraran las metricas (cantidad de imagenes, peso de la pagina, tiempo de carga, cantidad de scripts, etc) -->
             </section>
 

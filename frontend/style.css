@@ -245,6 +245,11 @@ body {
     flex-direction: column; /* Apila el titulo arriba y el contenido abajo */
     cursor: pointer; /* Avisa que el panel se puede clickear */
     transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; /* Anima de forma suave el agrandado, el brillo y el apagado/prendido */
+    /* IMPORTANTE: min-height: 0 es lo que le permite a un item de Grid encogerse por
+       debajo del tamaño de su contenido. Sin esto, si un panel recibe una lista muy
+       larga de datos del backend, la caja entera se estira y se come a las vecinas
+       en vez de activar el scroll interno del .contenido-panel */
+    min-height: 0;
 }
 
 /* Al pasar el cursor por encima, el panel crece un poquito y se prende */
@@ -260,6 +265,23 @@ body {
     padding: 10px; /* Le da una separacion interna para que el texto no toque la linea de puntitos */
     margin-bottom: 5px; /* Empuja el contenido de abajo (los datos) a 5 px de distancia */
     background-color: rgba(0, 255, 65, 0.05); /* Pinta el fondito del titulo con un verde transparente */
+
+    /* El titulo ahora es flexbox para poder alinear el icono SVG tactico justo
+       al lado del texto, prolijo y a la misma altura */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* El titulo nunca se achica, aunque el contenido de abajo pida mucho espacio */
+}
+
+/* Icono SVG tactico de cada panel. Usa stroke="currentColor" en el SVG, asi que
+   con solo definir el "color" aca (o dejar que herede el verde neon del tema)
+   el icono cambia de color automaticamente si el usuario elige otro tema */
+.icono-panel {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0; /* Que nunca se achique ni se deforme, pase lo que pase con el texto del titulo */
+    filter: drop-shadow(0 0 3px rgba(var(--color-terminal-rgb), 0.6)); /* Un brillito sutil, a juego con el resto de la estetica neon */
 }
 
 /* ==========================================================================
@@ -274,22 +296,43 @@ body {
     transition: font-size 0.2s ease, font-family 0.2s ease; /* Que el cambio de tamaño y de tipografía se sienta suave, no un salto brusco */
 }
 
-/* Clase protectora: evita que la pagina se rompa si hay mil enlaces (Overflow) */
+/* ==========================================================================
+   SISTEMA DE SCROLLBAR TACTICO (para los 4 paneles)
+   Antes solo el panel de ENLACES tenia scroll activo. Ahora los 4 paneles lo
+   llevan de fabrica, asi cuando el backend dispare listas largas (muchos
+   enlaces, muchas tecnologias detectadas, etc.) el panel nunca se desborda:
+   se activa una barrita de scroll interna prolija en vez de romper la grilla
+   ========================================================================== */
 .scroll-activo {
     overflow-y: auto; /* Le dice al navegador: "Si el texto es muy largo, cortalo y poné una barra deslizable vertical" */
-    max-height: calc(100% - 10px); /* Evita matematicamente que la caja de texto se pase de su limite */
+    overflow-x: hidden; /* Nunca dejamos que se desborde de costado, solo hacia abajo */
+    min-height: 0; /* Refuerzo: deja que la caja se achique por debajo de su contenido para que el scroll realmente entre en accion */
+    flex-grow: 1; /* Ocupa todo el espacio vertical que le sobra al panel, debajo del titulo */
+
+    /* Soporte de scrollbar "fina y tactica" para Firefox (los navegadores
+       basados en Chrome/WebKit usan las reglas ::-webkit-scrollbar de mas abajo) */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-terminal) #111;
 }
 
-/* Personalizacion de la la scrollbar */
-::-webkit-scrollbar {
+/* Personalizacion de la scrollbar en navegadores WebKit (Chrome, Edge, Safari).
+   Se aplica sobre .scroll-activo puntualmente, que es la clase que ahora
+   comparten los 4 paneles y el historial del menu lateral */
+.scroll-activo::-webkit-scrollbar {
     width: 6px; /* Hace que la barra de scroll sea finita */
 }
-::-webkit-scrollbar-track {
-    background: #111; /* Pinta la barra de un gris muy oscuro */
+.scroll-activo::-webkit-scrollbar-track {
+    background: #111; /* Pinta el carril de un gris muy oscuro */
+    border-radius: 10px;
 }
-::-webkit-scrollbar-thumb {
+.scroll-activo::-webkit-scrollbar-thumb {
     background-color: var(--color-terminal); /* Pinta el cuadradito que se mueve con el mouse de color verde */
     border-radius: 10px; /* Redondea el cuadradito del scroll */
+    transition: 0.2s;
+}
+/* El cuadradito del scroll se prende mas fuerte al pasarle el mouse por encima, mismo lenguaje visual que el resto de la web */
+.scroll-activo::-webkit-scrollbar-thumb:hover {
+    box-shadow: 0 0 6px var(--color-terminal);
 }
 
 /* ==========================================================================
@@ -439,8 +482,12 @@ body {
 }
 
 /* Clase que le agregaremos con JS para que el menú entre a la pantalla */
+/* Antes usaba "right: 0" y quedaba pegado del todo al borde del navegador,
+   lo que hacía que el botón [X] de cerrar quedara comido contra el borde
+   (o contra la barra de scroll del navegador). Con este margen de 16px el
+   panel queda "flotando" un poco separado del borde, y el botón respira mejor */
 #menu-lateral.abierto {
-    right: 0;
+    right: 26px;
 }
 
 .menu-header {
