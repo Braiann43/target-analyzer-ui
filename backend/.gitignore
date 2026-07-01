@@ -1,0 +1,16 @@
+# Dependencias de Node (carpeta súper pesada)
+node_modules/
+
+# Archivos de entorno (contraseñas, usuarios o tokens secretos)
+.env
+.env.*
+
+# Archivos de registro de errores (logs)
+logs
+*.log
+npm-debug.log*
+
+# Archivos basura del sistema operativo o editores de código
+.DS_Store
+Thumbs.db
+.vscode/
