@@ -1,20 +1,16 @@
 {
-  "name": "backend",
+  "name": "target-analyzer-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "robot.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "Backend de prueba para Target Analyzer: recibe una URL, la analiza en el servidor (headers, HTML, SSL, peso, tecnologias) y devuelve el JSON que espera script.js",
+  "main": "server.js",
   "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
   "dependencies": {
-    "cheerio": "^1.2.0",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "puppeteer": "^25.2.1"
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
   }
 }

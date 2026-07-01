@@ -1,136 +1,136 @@
 /* ==========================================================================
-   VARIABLES GLOBALESS
-   El :root es la raíz de todo. Estas son las "etiquetas" con colores y estilos, aca definimos las variables globales por asi decirlo, las cuales las podemos usar en todo momento mas adelante en el codigo, y si queremos cambiar un color o estilo, solo tenemos que cambiarlo aca y se va a actualizar
+   VARIABLES GLOBALES
+   aca guardo los colores para no andar acordandome los codigos todo el tiempo (el :root es lo principal)
    ========================================================================== */
 
 :root {
-    --fondo-absoluto: #050505; /* Crea un color negro para el fondo de la pantalla */
-    --color-terminal: #00ff41; /* Crea un verde neon (color base, se puede cambiar en vivo desde el selector de color) */
-    --color-terminal-rgb: 0, 255, 65; /* Los mismos 3 numeritos (R,G,B) del color de arriba, separados por comas. Los necesitamos asi sueltos para poder armar sombras con transparencia (rgba) sin importar que color elija el usuario */
-    --color-alerta: #f2ff00;   /* Crea un color (naranja/amarillo) para los avisos. Se mantiene fijo para que los errores siempre se distingan del tema elegido */
-    --borde-panel: 1px solid var(--color-terminal); /* Guarda el estilo de una linea finita de 1 px, ahora apuntando al color elegido */
-    --sombra-neon: 0 0 10px rgba(var(--color-terminal-rgb), 0.2); /* Guarda un efecto de brillo suave, armado con los componentes RGB */
-    --sombra-activa: 0 0 15px rgba(var(--color-terminal-rgb), 0.6); /* Guarda un brillo mas fuerte para cuando escribimos, mismo truco */
+    --fondo-absoluto: #050505; /* un negro puro pero no tanto */
+    --color-terminal: #00ff41; /* verde re hacker (este cambia si tocas el menu despues) */
+    --color-terminal-rgb: 0, 255, 65; /* los mismos numeros separados para hacer sombras transparentes */
+    --color-alerta: #f2ff00;   /* amarillito/naranja para errores, este no lo cambio nunca */
+    --borde-panel: 1px solid var(--color-terminal); /* el borde finito comun que uso en todos lados */
+    --sombra-neon: 0 0 10px rgba(var(--color-terminal-rgb), 0.2); /* brillito sutil con el rgba que arme arriba */
+    --sombra-activa: 0 0 15px rgba(var(--color-terminal-rgb), 0.6); /* brillito mas fuerte cuando le pasas el mouse */
 }
 
 /* ==========================================================================
-   RESETEO UNIVERSAL 
-   El asterisco (*) lo usamos para decir "aplicale esto a TODAS las etiquetas HTML"
+   RESETEO GENERAL
+   con el asterisco (*) le aplico a TODO, me salvo la vida esto
    ========================================================================== */
 * {
-    box-sizing: border-box; /* Obliga a que los bordes no agranden el tamaño de las cajas */
-    margin: 0; /* Le quita todo el margen (espacio hacia afuera) a todos los elementos */
-    padding: 0; /* Le quita todo el relleno (espacio hacia adentro) a todos los elementos */
+    box-sizing: border-box; /* hace que si pongo un borde, la caja no se me haga mas grande de la nada */
+    margin: 0; /* saca el margen de mierda que viene por defecto en el chrome */
+    padding: 0; /* saca el espacio de adentro tambien */
 }
 
 /* ==========================================================================
-   CUERPO DE LA PAGINA
-   Aca configuramos el aspecto de toda la pantalla de la compu, osea todo lo que el usuario ve, y ademas lo centramos para que el bunker quede justo en el medio de la pantalla, sin importar el tamaño del monitor o celular
+   FONDO DE LA PAGINA
+   aca arreglo el fondo de la pantalla y centro todo pa q quede en el medio
    ========================================================================== */
 body {
-    background-color: var(--fondo-absoluto); /* Pinta el fondo de toda la web con el negro que creamos arriba */
-    color: var(--color-terminal); /* Pinta todas las letras de color verde neon */
-    font-family: 'Courier New', Courier, monospace; /* Cambia la tipografaia para que parezca maquina de escribir/codigo */
-    height: 100vh; /* Obliga a que la pagina mida exactamente el 100% del alto de la pantalla del usuario */
+    background-color: var(--fondo-absoluto); /* le mando el negro que hice arriba */
+    color: var(--color-terminal); /* todas las letras en verde por defecto */
+    font-family: 'Courier New', Courier, monospace; /* tipo letra de consola vieja que me pedia el tuto */
+    height: 100vh; /* para que ocupe todo el alto (el profe dijo que use vh que es viewport height o algo asi) */
     
-    /* En estas lineas centramos el bunker en el medio de la pantalla */
-    display: flex; /* Activa el modo "caja flexible" para poder mover los elementos */
-    justify-content: center; /* Centra el contenido horizontalmente (de izquierda a derecha) */
-    align-items: center; /* Centra el contenido verticalmente (de arriba hacia abajo) */
+    /* aca el re truco de flex para centrar todo y no renegar */
+    display: flex; /* activo el modo de cajitas */
+    justify-content: center; /* lo tiro al medio a lo ancho */
+    align-items: center; /* lo tiro al medio a lo alto */
 }
 
 /* ==========================================================================
-   CONTENEDOR MAESTRO
-   Es la caja gigante que encierra toda nuestra aplicacion
+   LA CAJA ENORME
+   esto agarra toda la aplicacion entera y le da los margenes
    ========================================================================== */
 .bunker-container {
-    width: 95%; /* Ocupa el 95% del ancho de la pantalla (deja un bordecito vacio a los lados) */
-    max-width: 1200px; /* Evita que la caja se estire demasiado en monitores muy grandes */
-    min-height: 90vh; /* Asegura que la caja ocupe al menos el 90% del alto de la pantalla */
-    display: flex; /* Activa el modo caja flexible para ordenar lo que hay adentro */
-    flex-direction: column; /* Usamos esto para apilar uno debajo del otro (en columna) */
-    gap: 20px; /* Crea una separacion exacta de 20 px entre el header y los paneles */
-    padding: 20px 0; /* Agrega un espacio interno de 20 px arriba y abajo para que no toque los bordes */
+    width: 95%; /* usa casi toda la compu pero deja un bordecito vacio a los costados */
+    max-width: 1200px; /* para que no quede feo y estirado si el monitor del tipo es gigante */
+    min-height: 90vh; /* por si no hay contenido todavia, igual ocupa casi todo */
+    display: flex; /* flexbox es god */
+    flex-direction: column; /* uno abajo del otro en fila india */
+    gap: 20px; /* espacito de 20px entre el head y las cajas de abajo */
+    padding: 20px 0; /* lo despego del borde un toque arriba y abajo */
 }
 
 /* ==========================================================================
-   CONSOLA DE ENTRADA
-   Es el encabezado donde el usuario va a escribir la URL y apretar el boton
+   DONDE ESCRIBIS (EL HEADER)
+   la barrita esa que parece de consola para poner los links
    ========================================================================== */
 #consola-input {
-    display: flex; /* Activa la caja flexible para poner el texto, el input y el boton de escaneo */
-    flex-wrap: wrap; /* Si la pantalla es muy chica, permite que los elementos bajen al siguiente renglon */
-    align-items: center; /* Alinea los elementos verticalmente al centro */
-    gap: 15px; /* Separa el texto, la barra de escribir y el boton por 15 px */
-    padding: 20px; /* Le da 20 px de espacio interno a la caja para que los elementos no toquen los bordes */
-    border: var(--borde-panel); /* Dibujamos el borde verde que guardamos en las variables arriba */
-    box-shadow: var(--sombra-neon); /* Le aplica el brillo verde suave alrededor de la caja */
-    background-color: #0a0a0a; /* Pinta el fondo de un gris apenas un poco mas claro que el negro de fondo */
+    display: flex; /* acomodo todo en linea horizontal */
+    flex-wrap: wrap; /* si es un celu y no entra, lo manda al renglon de abajo pa q no se rompa */
+    align-items: center; /* lo centro bien cheto en el medio del renglon */
+    gap: 15px; /* separo los botones y los textos */
+    padding: 20px; /* gordura de la caja (le da espacio pa dentro) */
+    border: var(--borde-panel); /* borde de mi variable verde */
+    box-shadow: var(--sombra-neon); /* la lucecita de la caja */
+    background-color: #0a0a0a; /* un fondito negro un poquito mas claro que el fondo general */
 }
 
-/* Pone en negrita al texto "[TARGET_URL]:" */
+/* negrita pa este texto nomas */
 #consola-input label {
-    font-weight: bold; /* Pone la letra mas gruesa */
+    font-weight: bold; /* letras mas gordas */
 }
 
-/* Configuracion de la caja donde el usuario escribe (el input) */
+/* donde va el link que escribis vos */
 #consola-input input {
-    flex-grow: 1; /* Hace que la barra de escritura se estire y se coma todo el espacio vacío que sobra en la fila. */
-    background: transparent; /* Hace que el fondo de la barra sea transparente */
-    border: none; /* Le borra los bordes feos que trae por defecto el navegador */
-    border-bottom: 1px solid var(--color-terminal); /* Dibuja la linea verde de abajo de donde va la url */
-    color: inherit; /* Le dice que herede el color de letra (verde) del contenedor padre */
-    font-family: inherit; /* Le dice que use la misma fuente de maquina de escribir */
-    font-size: 1.2rem; /* Agranda un poco el tamaño de la letra que escribe el usuario */
-    outline: none; /* Borra el recuadro azul horrible que aparece por defecto al hacer clic para escribir */
-    padding: 5px; /* Separa apenitas el texto de la linea subrayada */
-    transition: 0.3s; /* Hace que cualquier cambio visual tarde 0.3 segundos (efecto suave) */
+    flex-grow: 1; /* alto truco: hace que se estire a lo largo todo lo que sobra de la fila */
+    background: transparent; /* lo dejo transparente asi se ve el negro de atras */
+    border: none; /* le borro los bordes feos que trae windows */
+    border-bottom: 1px solid var(--color-terminal); /* le pongo solo una rayita verde abajo */
+    color: inherit; /* le digo que copie el color verde del body asi no lo escribo de nuevo */
+    font-family: inherit; /* copio la fuente de maquinita tmb */
+    font-size: 1.2rem; /* letra apenitas mas grande */
+    outline: none; /* le saco ese recuadro azul horrible que le pone chrome cuando le haces click */
+    padding: 5px; /* no lo pego tanto a la raya de abajo */
+    transition: 0.3s; /* animacioncita piola suavecita */
 }
 
-/* Efecto al hacer clic para escribir en el input */
+/* cuando el chabon le da click adentro para escribir */
 #consola-input input:focus {
-    border-bottom: 2px solid var(--color-terminal); /* Hace que la linea subrayada se ponga mas gruesa */
-    box-shadow: 0px 5px 10px -5px var(--sombra-activa); /* Enciende el brillo fuerte por debajo de la línea */
+    border-bottom: 2px solid var(--color-terminal); /* la rayita se engrosa a 2px */
+    box-shadow: 0px 5px 10px -5px var(--sombra-activa); /* le pongo un brillo para abajo estilo neon groso */
 }
 
-/* Configuracion del Boton de Escaneo */
+/* el boton verde de disparar */
 #consola-input button {
-    background-color: var(--color-terminal); /* Pinta el fondo del boton de color verde neon */
-    color: #000; /* Pinta las letras del boton de negro */
-    border: none; /* Le borra el borde por defecto */
-    font-weight: bold; /* Pone las letras en negrita */
-    cursor: pointer; /* Cambia la flechita del mouse por una "manito" de hacer clic cuando pasas por encima */
-    transition: 0.2s; /* Hace que el cambio de color al pasar el mouse sea una animación suave */
-    padding: 10px 20px; /* Lo hace más "gordito" dándole relleno interno (arriba/abajo y lados) */
-    border-radius: 2px; /* Le redondea las puntas apenitas (casi ni se nota, pero queda mejor) */
+    background-color: var(--color-terminal); /* le pinto el verde mio */
+    color: #000; /* texto negro pa q contraste y se lea bien */
+    border: none; /* sin bordes */
+    font-weight: bold; /* gordita la letra */
+    cursor: pointer; /* manito de hacer click cuando pasas por encima */
+    transition: 0.2s; /* animacion mas rapida q la de recien */
+    padding: 10px 20px; /* un rellenito al boton pa q quede re pro y gordo */
+    border-radius: 2px; /* le pelo un toque las puntitas para que no pinche */
 }
 
-/* Efecto al pasar el mouse por encima del botón */
+/* si le pasas el mouse por encima al boton */
 #consola-input button:hover {
-    background-color: var(--color-alerta); /* Cambia el botón al color ámbar/naranja. */
-    box-shadow: 0 0 15px var(--color-alerta); /* Le prende un brillo naranja alrededor. */
-    transform: scale(1.02); /* Agranda el botón un 2% para dar el efecto de que "sale" de la pantalla. */
+    background-color: var(--color-alerta); /* se pone naranja/amarillo xq pinto */
+    box-shadow: 0 0 15px var(--color-alerta); /* brillito re loco alrededor */
+    transform: scale(1.02); /* sale de la pantalla jaja (se agranda un 2% no es mucho) */
 }
 
-/* Botón rojo de abortar, para diferenciarlo visualmente del verde de escaneo */
+/* el boton de parar todo que tuve que agregar despues a pedido */
 #btn-abortar {
-    background-color: #1a0000; /* Fondo casi negro con tinte rojo */
-    color: #ff3b3b; /* Letras rojas */
-    border: 1px solid #ff3b3b; /* Borde rojo fino */
-    display: none; /* Ocultamos el boton antes de iniciar escaneo */
+    background-color: #1a0000; /* color casi negro pero medio bordo de terror */
+    color: #ff3b3b; /* letra re roja sangre */
+    border: 1px solid #ff3b3b; /* bordecito rogelio */
+    display: none; /* por ahora lo escondo (cuando escaneo lo muestro con javascript) */
 }
 
 #btn-abortar:hover {
-    background-color: #ff3b3b; /* Al pasar el mouse, se invierte: fondo rojo */
-    color: #000; /* Letras negras */
-    box-shadow: 0 0 15px #ff3b3b; /* Brillo rojo */
+    background-color: #ff3b3b; /* al pasar el mouse se da vuelta, fondo rojo puro */
+    color: #000; /* letras negras */
+    box-shadow: 0 0 15px #ff3b3b; /* brilla feo en rojo */
 }
 
 /* ==========================================================================
-   SELECTOR DE COLOR (personalización del tema)
+   EL COSO DE COLORES (en el menu de la izq que arme recien)
    ========================================================================== */
 .color-picker-marco {
-    display: inline-block; /* LA CLAVE: Evita que el marco se estire hacia la derecha */
+    display: inline-block; /* ESTO ES ALTO HACK: para que el marquito no se estire de mas a la derecha */
     width: 40px; 
     height: 40px;
     border: var(--borde-panel); 
@@ -141,7 +141,7 @@ body {
     flex-shrink: 0; 
 }
 
-/* Brillo al pasar el mouse */
+/* brilla cuando le pasas el mouse obvio */
 .color-picker-marco:hover {
     box-shadow: var(--sombra-activa);
 }
@@ -152,17 +152,16 @@ body {
     border: none;
     padding: 0;
     cursor: pointer;
-    /* Hacemos el input más grande que el marco para esconder los bordes nativos */
+    /* lo hago gigante para tapar el cuadradito nativo re asqueroso de windows/chrome */
     width: 60px; 
     height: 60px;
-    /* Lo empujamos hacia arriba y la izquierda para que quede centrado en el marco */
+    /* lo subo a lo bruto con margenes negativos para que se acomode al medio de mi marco */
     margin: -10px; 
     background-color: transparent; 
 }
 
 /* ==========================================================================
-   BARRA DE PROGRESO (CARGA)
-   Indicador visual del estado del escaneo.
+   LA BARRITA CARGANDO TRUCHA
    ========================================================================== */
 .panel-progreso {
     display: flex;
@@ -172,27 +171,28 @@ body {
     border: 1px dashed var(--color-terminal);
     background-color: var(--fondo-absoluto);
     
-    /* ESTO LA MANDA AL RENGLÓN DE ABAJO Y LA ESTIRA */
+    /* ESTO ROMPE LA LINEA DE ARRIBA Y LA TIRA PA ABAJO ENTERA OCUANDO TODO */
     flex-basis: 100%; 
     margin-top: 10px;
 }
 
 .barra-tactica {
-    flex-grow: 1; /* Ocupa el espacio libre en el medio */
+    flex-grow: 1; /* relleno el hueco que quedo vacio en el medio */
     height: 22px;
     appearance: none;
     -webkit-appearance: none;
 }
 
-/* Fondo de la barra (el carril vacío) */
+/* el fondo vacio de la barra (el cañito por donde pasa) */
 .barra-tactica::-webkit-progress-bar {
     background-color: transparent;
     border: 1px solid var(--color-terminal);
 }
 
-/* Relleno de la barra (la parte que avanza, con textura a rayas) */
+/* lo de adentro de la barra que avanza */
 .barra-tactica::-webkit-progress-value {
     background-color: var(--color-terminal);
+    /* alta magia oscura de css pa hacer rayitas diagonales (lo robe descaradamente de codepen) */
     background-image: repeating-linear-gradient(
         -45deg,
         transparent,
@@ -202,7 +202,7 @@ body {
     );
 }
 
-/* Relleno para que también ande en Firefox */
+/* le meti esto para firefox por que si no no andaba y quedaba re feo */
 .barra-tactica::-moz-progress-bar {
     background-color: var(--color-terminal);
     background-image: repeating-linear-gradient(
@@ -220,118 +220,115 @@ body {
     font-size: 1.1rem;
 }
 /* ==========================================================================
-   GRILLA TÁCTICA
-   El contenedor que aloja los 4 paneles de informacion
+   LA GRILLA DE LOS 4 CUADRADITOS
    ========================================================================== */
 .paneles-grid {
-    display: grid; /* Cambiamos de flexbox a Grid para armar un tablero bidimensional (filas y columnas) */
-    grid-template-columns: 1fr 1fr; /* Crea 2 columnas exactamente iguales (50% y 50% de la pantalla) */
-    grid-template-rows: 1fr 1fr; /* Crea 2 filas exactamente iguales (50% y 50% del alto disponible) */
-    gap: 15px; /* Crea una separacion de 15 px entre los 4 paneles para que no se peguen */
-    flex-grow: 1; /* Hace que la grilla entera se estire para ocupar todo el alto que sobró debajo de la consola */
+    display: grid; /* saco flexbox aca y clavo grid pa hacer cuadricula de una, es mas facil */
+    grid-template-columns: 1fr 1fr; /* clavo dos columnas iguales (el fr es fraccion) */
+    grid-template-rows: 1fr 1fr; /* dos filas iguales tmb */
+    gap: 15px; /* las separo un toque asi no se pegan */
+    flex-grow: 1; /* me robo todo el alto q quede de la pantalla despues del topbar */
 }
 
 /* ==========================================================================
-   DISEÑO DE CADA PANEL
-   Este diseño lo aplicamos a los 4 paneles
+   ESTILO DE CADA PANEL BUNKERCITO
    ========================================================================== */
 .panel-bunker {
-    background-color: var(--fondo-absoluto); /* Fondo negro para cada caja */
-    border: var(--borde-panel); /* Borde verde fino alrededor de cada caja */
-    box-shadow: var(--sombra-neon); /* Brillo verde sutil en cada caja */
-    display: flex; /* Prende Flexbox aca adentro para ordenar el titulo y el contenido */
-    flex-direction: column; /* Apila el titulo arriba y el contenido abajo */
-    cursor: pointer; /* Avisa que el panel se puede clickear */
-    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; /* Anima de forma suave el agrandado, el brillo y el apagado/prendido */
+    background-color: var(--fondo-absoluto); /* fondo negro nomas */
+    border: var(--borde-panel); /* mi bordecito lindo variable */
+    box-shadow: var(--sombra-neon); /* luz tranca */
+    display: flex; /* flexbox adentrito pa separar titulo del texto */
+    flex-direction: column; /* los apilo hacia abajo */
+    cursor: pointer; /* manito manito pa avisar que se hace click */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; /* todas animaciones piolas de css juntitas */
 }
 
-/* Al pasar el cursor por encima, el panel crece un poquito y se prende */
+/* si tocas el cuadradito con el mouse... */
 .panel-bunker:hover {
-    transform: scale(1.03); /* Agranda el panel un 3% */
-    box-shadow: var(--sombra-activa); /* Le sube el brillo verde */
-    z-index: 2; /* Para que no quede tapado por los paneles vecinos al crecer */
+    transform: scale(1.03); /* crece un toque 3% creo pa q resalte */
+    box-shadow: var(--sombra-activa); /* brilla como loco y le sube la intensidad */
+    z-index: 2; /* pa que pase por arriba de los otros paneles y no buguee con los vecinos */
 }
 
-/* Diseño de cada titulo de los paneles */
+/* el titulito verde chiquito de cada caja */
 .panel-titulo {
-    border-bottom: 1px dashed var(--color-terminal); /* Dibuja una linea de puntitos verdes debajo del titulo */
-    padding: 10px; /* Le da una separacion interna para que el texto no toque la linea de puntitos */
-    margin-bottom: 5px; /* Empuja el contenido de abajo (los datos) a 5 px de distancia */
-    background-color: rgba(0, 255, 65, 0.05); /* Pinta el fondito del titulo con un verde transparente */
+    border-bottom: 1px dashed var(--color-terminal); /* linea punteadita re hacker */
+    padding: 10px; /* engordo la zona */
+    margin-bottom: 5px; /* empujo a 5px los datos que van abajo asi no se chocan */
+    background-color: rgba(0, 255, 65, 0.05); /* le pinto un fondito medio verdecito recontra transparente */
 }
 
 /* ==========================================================================
-   CONTROL DE LOS DATOS Y EL SCROLL
-   Donde el robot va a poner la informacion
+   ADENTRO DE LOS PANELES (donde van los textos)
    ========================================================================== */
 .contenido-panel {
-    padding: 15px; /* Le da un buen margen interno para que la lectura de datos sea comoda */
-    line-height: 1.6; /* Aumenta el espacio entre cada renglon de texto para que no quede todo apretado */
+    padding: 15px; /* buen gordito pa que los datos no queden todos pegados al borde */
+    line-height: 1.6; /* mas espacio entre los renglones, un hack visual q garpa pa q se lea mejor */
 }
 
-/* Clase protectora: evita que la pagina se rompa si hay mil enlaces (Overflow) */
+/* esto es por si los links del tercer panel son infinitos */
 .scroll-activo {
-    overflow-y: auto; /* Le dice al navegador: "Si el texto es muy largo, cortalo y poné una barra deslizable vertical" */
-    max-height: calc(100% - 10px); /* Evita matematicamente que la caja de texto se pase de su limite */
+    overflow-y: auto; /* si el texto es re largo, le mete la barrita de scroll para que no se desborde y arruine la web */
+    max-height: calc(100% - 10px); /* no me pregunten por la matematica, le mande calc y me acomodo la caja justo al limite */
 }
 
-/* Personalizacion de la la scrollbar */
+/* tunearle la barra de scrollear pa q no sea la gris asquerosa que viene de fabrica */
 ::-webkit-scrollbar {
-    width: 6px; /* Hace que la barra de scroll sea finita */
+    width: 6px; /* re finita queda mejor */
 }
 ::-webkit-scrollbar-track {
-    background: #111; /* Pinta la barra de un gris muy oscuro */
+    background: #111; /* caminito por donde baja casi negro */
 }
 ::-webkit-scrollbar-thumb {
-    background-color: var(--color-terminal); /* Pinta el cuadradito que se mueve con el mouse de color verde */
-    border-radius: 10px; /* Redondea el cuadradito del scroll */
+    background-color: var(--color-terminal); /* el cosito q moves pintado de mi verde */
+    border-radius: 10px; /* redondito de los costados, detalle de pro */
 }
 
 /* ==========================================================================
-   ADAPTABILIDAD PARA CELULARES
-   Esto dice: "Si la pantalla mide 768 pixeles o menos, cambia lo siguiente"
+   PARA CELULAR Y PANTALLITAS CHICAS
+   una reverenda paja esto pero tuve q hacerlo pa q no se achicharre todo
    ========================================================================== */
 @media (max-width: 768px) {
     .paneles-grid {
-        grid-template-columns: 1fr; /* Rompe las 2 columnas y pone todo en 1 sola columna */
-        grid-template-rows: auto; /* Deja que el alto de cada fila se acomode solo al texto */
+        grid-template-columns: 1fr; /* a tomar por saco las 2 columnas, mando una solita larga abajo de la otra */
+        grid-template-rows: auto; /* las filas se estiran lo que pinten segun el texto */
     }
     
     .panel-bunker {
-        min-height: 250px; /* Evita que en un celular los paneles se encimen */
+        min-height: 250px; /* pa q no queden tan enanas las cajitas aplastadas en el celu */
     }
 
-    /* En modo foco, en celular dejamos que las 3 ventanitas usen menos ancho cada una y se pueda hacer scroll horizontal si hace falta */
+    /* el modo foco pero version tercermundista en celus para q maso safe */
     .paneles-grid.modo-foco {
-        grid-template-rows: 1fr 90px; /* Achicamos un poco la franja de abajo */
+        grid-template-rows: 1fr 90px; /* acorto la franja de los mini paneles que van abajo */
     }
 
     .paneles-grid.modo-foco .panel-minimizado .panel-titulo {
-        font-size: 0.65rem; /* Letra más chica todavía para que entre en pantallas angostas */
+        font-size: 0.65rem; /* letra minuscula mal para q entre en la pantallita ancha */
     }
 }
 
 /* ==========================================================================
-   FONDO MATRIX
-   El canvas que dibuja la lluvia de caracteres cayendo detras de todo
+   EL FONDO DE MATRIX EN CANVAS
    ========================================================================== */
 #matrix-rain {
-    position: fixed; /* Lo clava en la pantalla para que no se mueva al hacer scroll */
+    position: fixed; /* clavado a la pantalla por mas q bajes con el scroll o hagas lo que hagas */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1; /* Lo manda atras de todo el contenido, para que quede de fondo */
-    opacity: 0.35; /* Lo apaga un poco para que no moleste la lectura de los paneles */
+    z-index: -1; /* lo mando re al fondo de todos, a la zona menos mil, es el fondo digamos */
+    opacity: 0.35; /* se lo bajo bastante la opacidad para q pueda leer las cajitas sin quedar bizco */
 }
 
+/* LA ANIMACION DE LOS 3 PUNTITOS QUE CARGAN */
 .esperando::after {
     content: '';
     animation: tipeo-espera 4s steps(1) infinite;
 }
 
 @keyframes tipeo-espera {
-    /* Tipeo letra por letra de "Esperando objetivo" */
+    /* alto quilombo arme aca pa hacer q parezca que la compu esta escribiendo (no sabia usar js para esto jaja) */
     0%   { content: 'E'; }
     4%   { content: 'Es'; }
     8%   { content: 'Esp'; }
@@ -351,89 +348,86 @@ body {
     64%  { content: 'Esperando objetiv'; }
     68%  { content: 'Esperando objetivo'; }
 
-    /* Frase ya completa: ahora ciclan los puntitos */
+    /* aca ya escribio la frase y hace los 3 puntitos... */
     72%  { content: 'Esperando objetivo'; }
     78%  { content: 'Esperando objetivo.'; }
     84%  { content: 'Esperando objetivo..'; }
     90%  { content: 'Esperando objetivo...'; }
 
-    /* Pausa final con todo escrito, antes de reiniciar */
+    /* se frena un toque con los 3 puntos y despues vuelve al principio en loop */
     96%  { content: 'Esperando objetivo...'; }
     100% { content: ''; }
 }
 
 /* ==========================================================================
-   MODO FOCO (estilo llamada de Discord)
-   Se activa con JS cuando el usuario hace clic en un panel.
-   Usamos Grid (en vez de Flexbox en columna) para poder armar 2 filas:
-   arriba la ventana grande, abajo una FILA con las 3 ventanitas chicas
-   una al lado de la otra, en vez de apiladas como una lista.
+   EL MODO LLAMADA DE DISCORD (LO DEL FOCO)
    ========================================================================== */
 
 .paneles-grid.modo-foco {
     display: grid;
-    grid-template-rows: 1fr 130px; /* Fila 1: la grande y flexible. Fila 2: franja fija de 130px para las chicas */
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 columnas iguales. El minmax(0, 1fr) es clave: sin el "0", el contenido de adentro (como el título) puede forzar a una columna a agrandarse más que las otras */
+    grid-template-rows: 1fr 130px; /* arriba la caja que tocas gigante, abajo dejo 130px clavados para las 3 chiquitas */
+    /* la re magia oscura minmax(0, 1fr) lo vi en un foro pq se me rompia el ancho xd, con eso lo ate con alambre */
+    grid-template-columns: repeat(3, minmax(0, 1fr)); 
     gap: 15px;
 }
 
-/* El panel que clickeaste ocupa toda la fila de arriba, de punta a punta */
+/* la caja que tocaste que va arriba y se hace gigante */
 .paneles-grid.modo-foco .panel-expandido {
     grid-row: 1;
-    grid-column: 1 / -1; /* Se estira desde la primera columna hasta la última */
+    grid-column: 1 / -1; /* abarca toda la primera fila de un extremo al otro a lo loco */
 }
 
-/* Los otros 3 paneles caen en la fila de abajo, cada uno en su propia columna (como ventanitas separadas) */
+/* las 3 ventanitas que bajan por chiquitas */
 .paneles-grid.modo-foco .panel-minimizado {
-    grid-row: 2;
-    min-width: 0; /* Refuerzo extra: sin esto, algunos navegadores igual dejan que el título empuje el ancho de la columna */
-    opacity: 0.75; /* Los apaga un poco visualmente, como inactivos */
-    overflow: hidden; /* Si el título no entra, lo recorta en vez de romper la ventanita */
+    grid-row: 2; /* a la fila 2 de castigo */
+    min-width: 0; /* seguro por si un navegador raro me lo quiere romper igual */
+    opacity: 0.75; /* las medio apago y las dejo grisaceas pa q parezcan inactivas */
+    overflow: hidden; /* tijeretazo al texto de adentro si sobra asi no me desborda la mini cajita */
 }
 
-/* Dentro de cada ventanita chica, achicamos el título para que entre mejor */
+/* achico el titulito verde de las minimizadas */
 .paneles-grid.modo-foco .panel-minimizado .panel-titulo {
     font-size: 0.75rem;
     padding: 8px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    white-space: nowrap; /* q no baje de renglon el titulo ni a palos */
+    text-overflow: ellipsis; /* le clava 3 puntitos si el titulo es muy largo pa entrar */
     overflow: hidden;
 }
 
-/* Como hay poco espacio, ocultamos el texto largo de adentro */
+/* y le borro lo de adentro pq total ni se va a ver, no entra y queda un asco */
 .paneles-grid.modo-foco .panel-minimizado .contenido-panel {
     display: none;
 }
 
-/* Si pasás el mouse por una ventanita chica, se nota más que es clickeable */
+/* pero si le pasas el mouse a las chiquitas le doy toda la onda pa q sepas q se puede volver a agrandar */
 .paneles-grid.modo-foco .panel-minimizado:hover {
-    opacity: 1;
-    transform: scale(1.05); /* Se agranda apenas, como las miniaturas de Discord */
+    opacity: 1; /* la prendo de nuevo */
+    transform: scale(1.05); /* pum apenitas para arriba (tipo miniaturita de llamda dc) */
     box-shadow: var(--sombra-activa);
-    z-index: 5; /* Para que al agrandarse no quede tapada por las vecinas */
+    z-index: 5; /* le subo esto asi no se come la esquina de la ventanita de al lado cuando se estira */
 }
 
 /* ==========================================================================
-   MENÚ LATERAL (PANEL DE CONTROL)
+   EL MENU FLOTANTE DEL COSTADO (ESTA ESCONDIDO)
    ========================================================================== */
 #menu-lateral {
     position: fixed;
     top: 0;
-    right: -400px; /* Lo esconde fuera de la pantalla por defecto */
+    right: -400px; /* LO ESCONDO AFUERA A LA DERECHA (alta rata soy jaja) asi arranca escondido */
     width: 320px;
     height: 100vh;
-    background-color: rgba(5, 5, 5, 0.95); /* Fondo oscuro semi-transparente */
+    background-color: rgba(5, 5, 5, 0.95); /* un negrito cheto con alfa pa q medio se vea el fondo */
     border-left: var(--borde-panel);
     box-shadow: -5px 0 20px rgba(0, 0, 0, 0.9);
-    z-index: 100; /* Asegura que pase por encima de los paneles y la matrix */
+    z-index: 100; /* pa q este reee arriba de todo no importa q carajo pase abajo con el matrix ni los botones */
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 25px;
-    transition: right 0.4s ease-in-out; /* Animación suave al abrir/cerrar */
+    transition: right 0.4s ease-in-out; /* esta es la animacion pa q entre deslizando re clean en vez de aparecer de golpe */
 }
 
-/* Clase que le agregaremos con JS para que el menú entre a la pantalla */
+/* y cuando el javascript de los clicks le mete la clase "abierto"... TATE, pasa a 0 de distancia y entra a la pantalla */
 #menu-lateral.abierto {
     right: 0;
 }
@@ -444,6 +438,7 @@ body {
     align-items: center;
 }
 
+/* la cruz rojita para cerrar el menu lateral */
 #btn-cerrar-menu {
     background: transparent;
     color: var(--color-alerta);
@@ -455,7 +450,7 @@ body {
 }
 
 #btn-cerrar-menu:hover {
-    background: var(--color-alerta);
+    background: var(--color-alerta); /* se vuelve un boton comun amarillo feo al pasar el mouse */
     color: #000;
 }
 
@@ -473,18 +468,19 @@ body {
     gap: 10px;
 }
 
+/* cada cosito del historial que tocas y te guarda la memoria */
 .item-historial {
     border: var(--borde-panel);
     padding: 10px;
     font-size: 0.85rem;
     cursor: pointer;
-    background-color: rgba(0, 255, 65, 0.05);
-    word-break: break-all;
+    background-color: rgba(0, 255, 65, 0.05); /* un verdecito de fondo alfa re lindo */
+    word-break: break-all; /* rompo las palabras largas (los links gigantas) pa que no estiren la cajita */
     transition: 0.2s;
 }
 
 .item-historial:hover {
-    background-color: var(--color-terminal);
+    background-color: var(--color-terminal); /* se marca como clickeado invirtiendo los colores */
     color: #000;
     box-shadow: var(--sombra-neon);
 }

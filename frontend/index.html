@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="matrix-rain"></canvas> <!-- fondo animado de la pagina (lluvia de carecteres estilo matrix) -->
-    <div class="bunker-container"> <!-- Envuelve toda la aplicacion, sirve para (centrado, fondo, margin, etc)-->
+    <canvas id="matrix-rain"></canvas> <!-- fondo tipo hacker de las peliculas -->
+    <div class="bunker-container"> <!-- la caja principal que guarda todo  -->
 
-        <header id="consola-input"> <!-- Es la barra de control donde el usuario ingresa la URL -->
-            <label for="target-url" class="prompt-text">[TARGET_URL]:</label> <!-- Etiqueta descriptiva del campo de texto -->
-            <input type="url" id="target-url" placeholder="https://"> <!-- Input para ingresar la URL del objetivo -->
+        <header id="consola-input"> <!-- aca va el link -->
+            <label for="target-url" class="prompt-text">[TARGET_URL]:</label> <!-- el textito del costado -->
+            <input type="url" id="target-url" placeholder="https://"> <!-- aca se escribe -->
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
             <button id="btn-abortar">[ABORTAR]</button>
             <button id="btn-menu">[MENÚ]</button>
@@ -23,35 +23,37 @@
             </div>
         </header>
 
-        <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->
+        <main class="paneles-grid"> <!-- la grilla para que quede todo ordenadito -->
 
-            <!-- Aca utilizamos la clase "panel-bunker" para aplicar estilos comunes a todos los paneles, y cada panel tiene un ID unico para su contenido especifico, y la class "contenido-panel" para el contenido interno, que se presentara desde JavaScript -->
+            <!-- uso la clase panel-bunker para no escribir mil veces lo mismo en el css xd -->
 
             <section class="panel-bunker" id="panel-vista">   
                 <h2 class="panel-titulo">PANEL 1: [VISTA]</h2>   
                 <div class="contenido-panel esperando"></div>
-                <!-- Aca se mostrara la vista/screenshot de la web scrapeada -->
+                <!-- aca va la foto de la pagina -->
             </section>
 
             <section class="panel-bunker" id="panel-tech">
                 <h2 class="panel-titulo">PANEL 2: [TECNOLOGÍAS]</h2>
                 <div class="contenido-panel esperando"></div>
-                <!-- Aca se mostraran las tecnologias detectadas en la web objetivo (frameworks, librerías, servidor, etc) Una vez que Node.js analice los headers y el HTML -->
+                <!-- aca tira con que hicieron la pagina (ni idea como funciona nodejs) -->
             </section>
 
             <section class="panel-bunker" id="panel-enlaces">
                 <h2 class="panel-titulo">PANEL 3: [ENLACES]</h2>
                 <div class="contenido-panel scroll-activo esperando"></div>
-                <!-- Aca se mostraran los enlaces encontrados en la web objetivo, solo que con un scroll activo para manejar grandes cantidades de enlaces -->
+                <!-- aca van los links. le meti scroll porque a veces son como 500 y se rompia toda la pagina -->
             </section>
 
             <section class="panel-bunker" id="panel-metricas">
                 <h2 class="panel-titulo">PANEL 4: [MÉTRICAS]</h2>
                 <div class="contenido-panel esperando"></div>
-                <!-- Aca se mostraran las metricas (cantidad de imagenes, peso de la pagina, tiempo de carga, cantidad de scripts, etc) -->
+                <!-- aca van los datos esos de peso y tiempo de carga -->
             </section>
 
-        </main> <!-- Menu Lateral-->
+        </main> 
+        
+        <!-- el menu del costado que esta escondido -->
         <div>
             <aside id="menu-lateral">
         <div class="menu-header">
