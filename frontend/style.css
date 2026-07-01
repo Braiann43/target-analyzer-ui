@@ -240,6 +240,7 @@ body {
     96%  { content: 'Esperando objetivo...'; }
     100% { content: ''; }
 }
+<<<<<<< HEAD
 
 .panel-bunker {
     background-color: var(--fondo-absoluto);
@@ -259,3 +260,75 @@ body {
     z-index: 10;
 }
 
+=======
+/* ==========================================================================
+   MODO FOCO (estilo llamada de Discord)
+   ========================================================================== */
+
+.panel-bunker {
+    cursor: pointer; /* Para que se note que se puede clickear */
+    transition: all 0.4s ease; /* Anima TODO el cambio: tamaño, posición, todo */
+    cursor: pointer;                              
+    transition: all 0.4s ease;                    
+}
+
+/* Cuando la grilla está en modo-foco, dejamos de usar Grid y pasamos a Flexbox en columna */
+.paneles-grid.modo-foco {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* El panel que clickeaste ocupa casi toda la pantalla */
+.paneles-grid.modo-foco .panel-expandido {
+    flex: 1; /* Se come todo el espacio vertical disponible */
+    order: 1; /* Lo obliga a ir primero (arriba), como en Discord */
+}
+
+/* Los otros 3 paneles se achican y se ponen en fila abajo */
+.paneles-grid.modo-foco .panel-minimizado {
+    flex: 0 0 90px; /* Altura fija chiquita, no crece ni se achica más */
+    order: 2; /* Los manda después del grande */
+    opacity: 0.7; /* Los apaga un poco visualmente, como inactivos */
+}
+
+/* Como hay poco espacio, ocultamos el texto largo y dejamos solo el título */
+.paneles-grid.modo-foco .panel-minimizado .contenido-panel {
+    display: none;
+}
+
+/* Si pasás el mouse por un panel chiquito, se nota más que es clickeable */
+.paneles-grid.modo-foco .panel-minimizado:hover {
+    opacity: 1;
+    box-shadow: var(--sombra-activa);
+}
+/* ==========================================================================
+   MODO FOCO (estilo llamada de Discord)
+   ========================================================================== */
+
+.paneles-grid.modo-foco {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.paneles-grid.modo-foco .panel-expandido {
+    flex: 1;
+    order: 1;
+}
+
+.paneles-grid.modo-foco .panel-minimizado {
+    flex: 0 0 90px;
+    order: 2;
+    opacity: 0.7;
+}
+
+.paneles-grid.modo-foco .panel-minimizado .contenido-panel {
+    display: none;
+}
+
+.paneles-grid.modo-foco .panel-minimizado:hover {
+    opacity: 1;
+    box-shadow: var(--sombra-activa);
+}
+>>>>>>> 8ea912b17cfd2ae6ff6ff0826368bc0a40e1e663
