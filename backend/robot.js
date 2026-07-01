@@ -3,8 +3,12 @@ const cheerio = require('cheerio');
 // Importamos el motor de automatización para controlar el navegador en segundo plano
 const puppeteer = require('puppeteer');
 
-// Definimos la función principal asincrónica que recibe la URL a escanear
-async function ejecutarExtraccion(urlObjetivo) {
+// Definimos la función principal asincrónica que recibe la URL a escanear.
+// El segundo parámetro (timeoutMs) le pone un techo duro a cuánto puede tardar
+// Puppeteer navegando: si el sitio objetivo es muy lento (o directamente no
+// contesta), Chrome tira su propio error de timeout ANTES de quedarse colgado
+// para siempre, y el catch de acá abajo se encarga de cerrarlo prolijamente.
+async function ejecutarExtraccion(urlObjetivo, timeoutMs = 20000) {
     // Inicializamos la variable del navegador fuera del try para poder cerrarla en el catch
     let navegador;
     try {
@@ -12,6 +16,9 @@ async function ejecutarExtraccion(urlObjetivo) {
         navegador = await puppeteer.launch({ headless: 'shell' });
         // Abrimos una pestaña limpia en el motor de renderizado
         const pagina = await navegador.newPage();
+        // Le aplicamos el mismo techo de tiempo a CUALQUIER navegación que hagamos
+        // en esta pestaña (goto, waitForNavigation, etc.), no solo a la primera
+        pagina.setDefaultNavigationTimeout(timeoutMs);
         // Registramos la marca de tiempo inicial para calcular la latencia posterior
         const tiempoInicio = Date.now();
 
@@ -74,6 +81,13 @@ async function ejecutarExtraccion(urlObjetivo) {
         if (navegador) {
             await navegador.close();
         }
+        // Si el error viene del techo de tiempo que le pusimos arriba (setDefaultNavigationTimeout),
+        // Puppeteer lo marca con name === 'TimeoutError'. Lo distinguimos para que server.js
+        // pueda devolverle al frontend un 504 (tiempo agotado) en vez de un 502 genérico.
+        if (error.name === 'TimeoutError') {
+            throw new Error('TIEMPO_DE_ESPERA_AGOTADO');
+        }
+        // Cualquier otro fallo (DNS que no resuelve, certificado roto, sitio caído, etc.)
         // Disparamos la alerta de fallo hacia el servidor receptor deteniendo la ejecución
         throw new Error('Falla en la intercepción de datos. Objetivo inalcanzable.');
     }
