@@ -36,7 +36,7 @@ Sigue estos pasos para correr el búnker central en tu máquina local:
 **1. Clonar el repositorio**
 
 git clone https://github.com/TU_USUARIO/target-analyzer.git
-cd target-analyzer
+cd backend
 
 2. Inicializar el entorno e instalar dependencias Asegúrate de tener Node.js instalado. Luego, ejecuta en la terminal de la carpeta raíz:
 
