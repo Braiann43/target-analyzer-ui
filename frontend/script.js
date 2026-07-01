@@ -22,6 +22,113 @@ const panelMetricas = document.querySelector('#panel-metricas .contenido-panel')
 let controladorPeticion;
 
 
+// 2.1 MOTOR DE SONIDOS (Web Audio API)
+// Generamos los sonidos con código en vez de usar archivos de audio externos:
+// así no dependemos de internet ni de pesar la carpeta con .mp3, y podemos
+// darles ese toque "retro/8-bit" que pega justo con la estética hacker.
+
+// El AudioContext es el "motor de sonido" del navegador. Los navegadores 
+// exigen que se cree recién DESPUÉS de un clic del usuario (por eso nace 
+// vacío acá, y se arma la primera vez que hace falta, dentro de un evento de clic).
+let audioCtx;
+
+function obtenerAudioCtx() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+}
+
+// Sonido de VICTORIA: un arpegio corto y ascendente (como una "fanfarria" chiptune).
+function reproducirSonidoVictoria() {
+    const ctx = obtenerAudioCtx();
+    const ahora = ctx.currentTime;
+    const notas = [523.25, 659.25, 783.99, 1046.50]; // Notas musicales Do5, Mi5, Sol5, Do6 (un acorde mayor, suena "alegre")
+
+    notas.forEach((frecuencia, indice) => {
+        const oscilador = ctx.createOscillator(); // El "generador" de la onda de sonido
+        const volumen = ctx.createGain(); // El "control de volumen" de esa nota
+
+        oscilador.type = 'square'; // Onda cuadrada = sonido tipo 8-bit/retro
+        oscilador.frequency.value = frecuencia;
+
+        const inicio = ahora + indice * 0.09; // Cada nota arranca un poquito después de la anterior
+        // Fade-in y fade-out rápidos para que no suene como un "clic" seco
+        volumen.gain.setValueAtTime(0.0001, inicio);
+        volumen.gain.exponentialRampToValueAtTime(0.15, inicio + 0.02);
+        volumen.gain.exponentialRampToValueAtTime(0.0001, inicio + 0.18);
+
+        oscilador.connect(volumen).connect(ctx.destination); // Conecta: oscilador -> volumen -> parlantes
+        oscilador.start(inicio);
+        oscilador.stop(inicio + 0.18);
+    });
+}
+
+// Sonido de DERROTA: un tono grave, tipo "buzzer", que cae de agudo a grave.
+function reproducirSonidoDerrota() {
+    const ctx = obtenerAudioCtx();
+    const ahora = ctx.currentTime;
+
+    const oscilador = ctx.createOscillator();
+    const volumen = ctx.createGain();
+
+    oscilador.type = 'sawtooth'; // Onda "sierra" = sonido más áspero, de alarma
+    oscilador.frequency.setValueAtTime(220, ahora); // Arranca en un tono medio
+    oscilador.frequency.exponentialRampToValueAtTime(80, ahora + 0.4); // Y cae a un tono grave, como un "error"
+
+    volumen.gain.setValueAtTime(0.15, ahora);
+    volumen.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.4);
+
+    oscilador.connect(volumen).connect(ctx.destination);
+    oscilador.start(ahora);
+    oscilador.stop(ahora + 0.4);
+}
+
+// Sonido de INICIO DE ESCANEO: un "blip" cortito y agudo, tipo confirmación de radar/sonar.
+// Es breve a propósito, para no pisar el sonido de victoria/derrota que suena más adelante.
+function reproducirSonidoInicioEscaneo() {
+    const ctx = obtenerAudioCtx();
+    const ahora = ctx.currentTime;
+
+    const oscilador = ctx.createOscillator();
+    const volumen = ctx.createGain();
+
+    oscilador.type = 'square'; // Mismo timbre que la victoria, pero acá es una sola nota cortita
+    oscilador.frequency.setValueAtTime(660, ahora); // Nota aguda, tipo "beep" de confirmación
+    oscilador.frequency.exponentialRampToValueAtTime(880, ahora + 0.08); // Sube un poquito, da sensación de "activando"
+
+    volumen.gain.setValueAtTime(0.0001, ahora);
+    volumen.gain.exponentialRampToValueAtTime(0.12, ahora + 0.01);
+    volumen.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.1);
+
+    oscilador.connect(volumen).connect(ctx.destination);
+    oscilador.start(ahora);
+    oscilador.stop(ahora + 0.1);
+}
+
+// Sonido de ABORTAR: un "apagado" descendente con onda triangular, distinto tanto
+// del beep de inicio como del buzzer de derrota (ese es más áspero/largo, este es 
+// más suave y corto, como "cortando la conexión" en vez de "fallando").
+function reproducirSonidoAbortar() {
+    const ctx = obtenerAudioCtx();
+    const ahora = ctx.currentTime;
+
+    const oscilador = ctx.createOscillator();
+    const volumen = ctx.createGain();
+
+    oscilador.type = 'triangle'; // Onda triangular = sonido más suave y "hueco", distinto a los otros 3
+    oscilador.frequency.setValueAtTime(500, ahora);
+    oscilador.frequency.exponentialRampToValueAtTime(120, ahora + 0.22); // Cae rápido, como "apagando motores"
+
+    volumen.gain.setValueAtTime(0.14, ahora);
+    volumen.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.22);
+
+    oscilador.connect(volumen).connect(ctx.destination);
+    oscilador.start(ahora);
+    oscilador.stop(ahora + 0.22);
+}
+
+
 // 3 ESCUCHADORES DE EVENTOS (LOS GATILLOS)
 
 // Cuando se hace clic en el botón de escaneo, dispara la función 'iniciarOperacion'.
@@ -31,6 +138,7 @@ botonEscaneo.addEventListener('click', iniciarOperacion);
 botonAbortar.addEventListener('click', () => {
     // Verifica si hay una petición viva viajando por la red en este momento.
     if (controladorPeticion) {
+        reproducirSonidoAbortar(); // Sonido distinto: "cortando la conexión", no es un error, es una decisión
         controladorPeticion.abort(); // Si la hay, presiona el "botón de autodestrucción" del Fetch.
     }
 });
@@ -41,6 +149,8 @@ botonAbortar.addEventListener('click', () => {
 // 'async' avisa que esta función tendrá pausas internas esperando a la red.
 async function iniciarOperacion() {
     
+    reproducirSonidoInicioEscaneo(); // Blip de confirmación: "escaneo activado"
+
     // SEGURIDAD: Si el usuario aprieta "Escanear" 2 veces rápido, cancelamos 
     // las peticiones anteriores para no saturar nuestro propio servidor.
     if (controladorPeticion) {
@@ -68,6 +178,7 @@ async function iniciarOperacion() {
         panelMetricas.innerHTML = '';
         panelEnlaces.innerHTML = '';
         panelMetricas.innerHTML = '';
+        reproducirSonidoDerrota(); // Sonido de error: la URL ni siquiera tiene forma válida
 
         // Sensor para limpiar al hacer clic sobre el mensaje de error y volver a enfocar el input.
         panelVista.querySelector('span').addEventListener('click', () => {
@@ -111,6 +222,7 @@ async function iniciarOperacion() {
             panelVista.innerHTML = `<span style="color: var(--color-alerta)">[ERROR: ${datos.error}]</span>`;
             panelTech.innerHTML = '';
             panelMetricas.innerHTML = '';
+            reproducirSonidoDerrota(); // Sonido de error: el backend rechazó la operación
             return;
         }
         
@@ -156,6 +268,8 @@ async function iniciarOperacion() {
         // Inyecta las métricas finales.
         panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
 
+        reproducirSonidoVictoria(); // Sonido de éxito: los 4 paneles ya se llenaron con datos reales
+
     
     // 8 GESTIÓN DE EXCEPCIONES Y ABORTOS
     
@@ -163,10 +277,13 @@ async function iniciarOperacion() {
         // Si el error ocurrió porque nosotros tocamos el botón "Abortar"...
         if (error.name === 'AbortError') {
             panelVista.innerHTML = `<span style="color: var(--color-alerta)">[OPERACIÓN CANCELADA POR EL OPERADOR]</span>`;
+            // Nota: acá NO suena la derrota a propósito. Cancelar fue una decisión 
+            // del usuario, no un fallo del sistema, así que no tiene sentido "castigarlo".
         } else {
             // Si el error es real (ej: el backend está apagado o no hay internet).
             panelVista.innerHTML = `<span style="color: var(--color-alerta)">[FALLO DE CONEXIÓN CON BÚNKER CENTRAL]</span>`;
             console.error(error); // Guarda el error feo en la consola oculta para el programador.
+            reproducirSonidoDerrota(); // Sonido de error: no hubo forma de completar el escaneo
         }
         // Ante un fallo, asegura que los demás paneles queden limpios.
         panelTech.innerHTML = '';
