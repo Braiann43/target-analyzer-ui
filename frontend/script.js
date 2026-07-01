@@ -173,3 +173,33 @@ async function iniciarOperacion() {
         panelMetricas.innerHTML = '';
     }
 }
+// Agarramos TODOS los paneles de una sola vez
+const paneles = document.querySelectorAll('.panel-bunker');
+const grilla = document.querySelector('.paneles-grid');
+
+paneles.forEach(panel => {
+    panel.addEventListener('click', () => {
+        
+        // Si el panel en el que clickeaste YA estaba expandido, volvemos todo a la normalidad
+        if (panel.classList.contains('panel-expandido')) {
+            grilla.classList.remove('modo-foco');
+            paneles.forEach(p => p.classList.remove('panel-expandido', 'panel-minimizado'));
+            return; // Cortamos la función acá, no hace falta seguir
+        }
+
+        // Si clickeaste un panel distinto, activamos el modo foco
+        grilla.classList.add('modo-foco');
+
+        paneles.forEach(p => {
+            if (p === panel) {
+                // Al que clickeaste le ponemos la clase de "grande"
+                p.classList.add('panel-expandido');
+                p.classList.remove('panel-minimizado');
+            } else {
+                // A los demás los mandamos a la fila de abajo, chiquitos
+                p.classList.add('panel-minimizado');
+                p.classList.remove('panel-expandido');
+            }
+        });
+    });
+});
