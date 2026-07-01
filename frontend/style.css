@@ -161,6 +161,65 @@ body {
 }
 
 /* ==========================================================================
+   BARRA DE PROGRESO (CARGA)
+   Indicador visual del estado del escaneo.
+   ========================================================================== */
+.panel-progreso {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    border: 1px dashed var(--color-terminal);
+    background-color: var(--fondo-absoluto);
+    
+    /* ESTO LA MANDA AL RENGLÓN DE ABAJO Y LA ESTIRA */
+    flex-basis: 100%; 
+    margin-top: 10px;
+}
+
+.barra-tactica {
+    flex-grow: 1; /* Ocupa el espacio libre en el medio */
+    height: 22px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Fondo de la barra (el carril vacío) */
+.barra-tactica::-webkit-progress-bar {
+    background-color: transparent;
+    border: 1px solid var(--color-terminal);
+}
+
+/* Relleno de la barra (la parte que avanza, con textura a rayas) */
+.barra-tactica::-webkit-progress-value {
+    background-color: var(--color-terminal);
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 8px,
+        rgba(0, 0, 0, 0.6) 8px,
+        rgba(0, 0, 0, 0.6) 16px
+    );
+}
+
+/* Relleno para que también ande en Firefox */
+.barra-tactica::-moz-progress-bar {
+    background-color: var(--color-terminal);
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 8px,
+        rgba(0, 0, 0, 0.6) 8px,
+        rgba(0, 0, 0, 0.6) 16px
+    );
+}
+
+.progreso-porcentaje {
+    color: var(--color-terminal);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+/* ==========================================================================
    GRILLA TÁCTICA
    El contenedor que aloja los 4 paneles de informacion
    ========================================================================== */

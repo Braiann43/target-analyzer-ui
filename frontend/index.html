@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="matrix-rain"></canvas> <!-- Fondo animado de lluvia de caracteres -->
+    <canvas id="matrix-rain"></canvas> #fondo animado de la pagina (lluvia de carecteres estilo matrix)
     <div class="bunker-container"> <!-- Envuelve toda la aplicacion, sirve para (centrado, fondo, margin, etc)-->
 
         <header id="consola-input"> <!-- Es la barra de control donde el usuario ingresa la URL -->
@@ -16,6 +16,11 @@
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
             <button id="btn-abortar">[ABORTAR]</button>
             <button id="btn-menu">[MENÚ]</button>
+            <div class="panel-progreso">
+                <label for="scan-progress" class="prompt-text">[PROGRESO_ESCANEO]:</label>
+                <progress id="scan-progress" class="barra-tactica" value="0" max="100"></progress>
+                <span class="progreso-porcentaje">0%</span>
+            </div>
         </header>
 
         <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->

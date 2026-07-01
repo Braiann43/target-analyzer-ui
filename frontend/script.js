@@ -495,3 +495,59 @@ async function cargarDatosDesdeMemoria(urlIngresada, datos) {
 
     reproducirSonidoVictoria();
 }
+// ==========================================================================
+//   CONTROL DE LA BARRA DE PROGRESO (SIMULACIÓN MIENTRAS NO HAY BACKEND)
+// ==========================================================================
+
+// 1. Capturamos los elementos del DOM (HTML) que vamos a manipular
+const btnScan = document.getElementById('btn-scan');
+const btnAbortar = document.getElementById('btn-abortar');
+const progressBar = document.getElementById('scan-progress');
+const progresoTexto = document.querySelector('.progreso-porcentaje');
+
+// Variable para guardar el temporizador y poder frenarlo si el usuario aborta
+let intervaloEscaneo;
+
+// 2. Función que arranca la simulación al hacer clic en [INICIAR_ESCANEO]
+btnScan.addEventListener('click', () => {
+    // Nos aseguramos de limpiar cualquier escaneo anterior que haya quedado a medias
+    clearInterval(intervaloEscaneo);
+    
+    // Reseteamos la barra a cero
+    let progresoActual = 0;
+    progressBar.value = progresoActual;
+    progresoTexto.textContent = '0%';
+    progresoTexto.style.color = 'var(--color-terminal)'; // Aseguramos que vuelva a ser verde
+
+    // Creamos un intervalo que se ejecuta cada 400 milisegundos (0.4 segundos)
+    intervaloEscaneo = setInterval(() => {
+        // Hacemos que avance de forma aleatoria entre 2% y 12% para que parezca real
+        let avanceAleatorio = Math.floor(Math.random() * 10) + 2;
+        progresoActual += avanceAleatorio;
+
+        // Si se pasa de 100, lo clavamos en 100 y frenamos el temporizador
+        if (progresoActual >= 100) {
+            progresoActual = 100;
+            clearInterval(intervaloEscaneo);
+            progresoTexto.textContent = '100% [COMPLETADO]';
+            
+            // Acá a futuro es donde le dirías a tus paneles: "¡Ey, saquense la clase .esperando y muestren los datos!"
+        } else {
+            progresoTexto.textContent = progresoActual + '%';
+        }
+
+        // Actualizamos visualmente la barra HTML5
+        progressBar.value = progresoActual;
+
+    }, 400); 
+});
+
+// 3. Función para frenar todo si el usuario entra en pánico y hace clic en [ABORTAR]
+btnAbortar.addEventListener('click', () => {
+    // Frenamos el contador en seco
+    clearInterval(intervaloEscaneo);
+    
+    // Le avisamos visualmente al usuario
+    progresoTexto.textContent = '[ESCANEO_ABORTADO]';
+    progresoTexto.style.color = '#ff3b3b'; // Lo ponemos en rojo
+});
