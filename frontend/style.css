@@ -127,40 +127,94 @@ body {
 
 /* ==========================================================================
    SELECTOR DE COLOR (personalización del tema)
-   El cuadradito donde el usuario elige el color de toda la interfaz.
-   Usamos un "marco" de tamaño fijo con overflow:hidden por afuera, y 
-   agrandamos el input por adentro para tapar el borde nativo feo del 
-   navegador. Así el cuadradito queda prolijo en Chrome, Edge y Firefox.
+   La opción "Colores" es un botón de texto más, del ancho de toda la fila,
+   dentro del desplegable de los 3 puntitos. Al clickearlo, se dispara por 
+   JS el input nativo (invisible) y se abre la ruedita de colores del 
+   sistema/navegador, con los campos R, G, B.
    ========================================================================== */
-.color-picker-marco {
-    width: 38px; /* Tamaño final que se va a ver, fijo pase lo que pase adentro */
-    height: 38px;
-    border: var(--borde-panel); /* Usa el mismo borde que el resto de los controles */
-    border-radius: 4px; /* Puntas redondeaditas */
-    overflow: hidden; /* Recorta cualquier borde/padding nativo que el navegador quiera agregarle al input de adentro */
+.opcion-colores {
+    width: 110px; /* Ancho fijo prolijo, ya que ahora es la única opción del desplegable */
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Mismo bordecito sutil que usan los controles de la consola */
+    border-radius: 4px;
+    color: var(--color-terminal);
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 8px 0;
     cursor: pointer;
-    transition: 0.3s; /* Para que el brillo del hover sea suave */
-    flex-shrink: 0; /* Evita que la consola lo achique si el espacio queda justo */
+    transition: 0.2s ease;
 }
 
-/* Brillo al pasar el mouse, igual que el resto de los controles de la consola */
-.color-picker-marco:hover {
-    box-shadow: var(--sombra-activa);
+.opcion-colores:hover {
+    background-color: rgba(var(--color-terminal-rgb), 0.15);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
-#color-picker {
-    -webkit-appearance: none; /* Le saca el estilo feo por defecto del navegador */
-    appearance: none;
+/* El input type="color" real. No usamos "hidden" ni display:none porque en 
+   varios navegadores eso impide que funcione el .click() disparado por JS. 
+   En cambio, lo dejamos en el DOM pero completamente invisible y sin espacio: 
+   position:absolute + tamaño 0 + opacity 0. */
+.color-picker-invisible {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
     border: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   PALETA RÁPIDA DE COLORES (los "tres puntitos")
+   Agrupa el cuadradito de color, el botón de tres puntitos y el desplegable
+   ========================================================================== */
+.selector-color-grupo {
+    position: relative; /* Ancla para que la paleta desplegable se ubique justo debajo, sin importar el resto de la página */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* El botoncito de "⋮" que abre y cierra la paleta */
+#btn-paleta {
+    background: transparent;
+    border: var(--borde-panel); /* Mismo borde que el resto de los controles, para que haga juego */
+    color: var(--color-terminal);
+    width: 24px;
+    height: 38px; /* Misma altura que el cuadradito de color, para que queden alineados */
+    font-size: 1.2rem;
+    line-height: 1;
     padding: 0;
     cursor: pointer;
-    /* Lo agrandamos bastante más que el marco y lo centramos con márgenes 
-       negativos: así, el borde/padding nativo que el navegador le pone al 
-       input queda "por afuera" del marco visible y el overflow:hidden del 
-       padre lo recorta, dejando ver solo el color puro, cuadrado y prolijo */
-    width: 60px;
-    height: 60px;
-    margin: -11px;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+#btn-paleta:hover {
+    box-shadow: var(--sombra-activa);
+    background-color: rgba(var(--color-terminal-rgb), 0.1); /* Un fondito sutil del color del tema al pasar el mouse */
+}
+
+/* El panel desplegable, ahora con una única opción adentro */
+.paleta-colores {
+    position: absolute; /* Se despega del flujo normal, para "flotar" sobre los paneles de abajo */
+    top: 46px; /* Lo ubica justo debajo de la fila de controles */
+    right: 0; /* Lo alinea con el borde derecho del grupo, para que no se salga de la pantalla */
+    display: block;
+    padding: 6px;
+    background-color: #0a0a0a; /* Mismo fondo que la consola de comandos */
+    border: var(--borde-panel);
+    box-shadow: var(--sombra-activa);
+    border-radius: 4px;
+    z-index: 20; /* Se asegura de quedar por encima de los paneles */
+}
+
+/* El display:block de arriba le gana en especificidad al display:none que el 
+   navegador le pone por defecto al atributo "hidden". Por eso, sin esta regla, 
+   la paleta queda visible siempre. Esto la fuerza a ocultarse cuando el JS 
+   le pone el atributo hidden (o sea, hasta que se haga clic en los 3 puntitos). */
+.paleta-colores[hidden] {
+    display: none;
 }
 
 /* ==========================================================================

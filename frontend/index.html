@@ -15,9 +15,19 @@
             <input type="url" id="target-url" placeholder="https://"> <!-- Input para ingresar la URL del objetivo -->
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
             <button id="btn-abortar">[ABORTAR]</button>
-            <label for="color-picker" class="prompt-text">[COLOR]:</label> <!-- Etiqueta del selector de color -->
-            <div class="color-picker-marco"> <!-- Marco fijo que obliga al selector a quedar cuadrado, recortando lo que el navegador quiera desbordar -->
-                <input type="color" id="color-picker" value="#00ff41" title="Elegí el color del tema">
+
+            <div class="selector-color-grupo"> <!-- Agrupa el botón de tres puntitos y la paleta, para poder ubicar el desplegable justo debajo -->
+                <button type="button" id="btn-paleta" title="Colores" aria-haspopup="true" aria-expanded="false">⋮</button> <!-- Único control visible: abre/cierra la paleta -->
+
+                <div id="paleta-colores" class="paleta-colores" hidden> <!-- Empieza oculta ("hidden"), JS la muestra al clickear el botón de arriba -->
+                    <!-- Única opción del menú: al clickearla, dispara el selector nativo 
+                         del sistema operativo/navegador (la ruedita de colores con los campos R, G, B) -->
+                    <button type="button" id="btn-colores" class="opcion-colores">Colores</button>
+
+                    <!-- El input nativo real. Queda invisible (no con "hidden", que rompería el .click() en 
+                         algunos navegadores) y lo disparamos por JS al clickear el botón "Colores" de arriba -->
+                    <input type="color" id="color-picker" value="#00ff41" class="color-picker-invisible" title="Elegí un color personalizado">
+                </div>
             </div>
         </header>
 

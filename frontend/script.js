@@ -372,3 +372,43 @@ if (colorGuardado) {
 selectorColor.addEventListener('input', (evento) => {
     aplicarColorTema(evento.target.value);
 });
+
+
+// 11 PALETA RÁPIDA DE COLORES (los tres puntitos)
+// Un atajo para no tener que abrir el selector nativo del navegador: 
+// con un clic sobre un puntito de color, se aplica ese color directo.
+
+const botonPaleta = document.getElementById('btn-paleta');
+const paletaColores = document.getElementById('paleta-colores');
+
+// Al hacer clic en el botón de "⋮", muestra u oculta la paleta
+botonPaleta.addEventListener('click', (evento) => {
+    evento.stopPropagation(); // Evita que este clic se confunda con el "clic afuera" que cierra la paleta (ver más abajo)
+    const estabaAbierta = !paletaColores.hidden;
+    paletaColores.hidden = estabaAbierta; // Si estaba abierta, la cierra. Si estaba cerrada, la abre.
+    botonPaleta.setAttribute('aria-expanded', String(!estabaAbierta));
+});
+
+// Al hacer clic en la opción de texto "Colores", dispara el input nativo (invisible) 
+// y se abre la ruedita de colores del sistema/navegador, con los campos R, G, B.
+const botonColores = document.getElementById('btn-colores');
+botonColores.addEventListener('click', (evento) => {
+    evento.stopPropagation(); // Evita que se confunda con el "clic afuera" que cierra la paleta
+    selectorColor.click(); // Abre el selector nativo del navegador
+});
+
+// Cuando el usuario confirma un color en la ruedita nativa (al cerrarla), 
+// cierra también la paleta de los 3 puntitos, para que no quede abierta atrás.
+selectorColor.addEventListener('change', () => {
+    paletaColores.hidden = true;
+    botonPaleta.setAttribute('aria-expanded', 'false');
+});
+
+// Si el usuario hace clic en cualquier otra parte de la página, cierra la paleta (si estaba abierta)
+document.addEventListener('click', (evento) => {
+    const clickFueraDeLaPaleta = !paletaColores.hidden && !paletaColores.contains(evento.target) && evento.target !== botonPaleta;
+    if (clickFueraDeLaPaleta) {
+        paletaColores.hidden = true;
+        botonPaleta.setAttribute('aria-expanded', 'false');
+    }
+});
