@@ -117,6 +117,7 @@ body {
     background-color: #1a0000; /* Fondo casi negro con tinte rojo */
     color: #ff3b3b; /* Letras rojas */
     border: 1px solid #ff3b3b; /* Borde rojo fino */
+    display: none; /* Ocultamos el boton antes de iniciar escaneo */
 }
 
 #btn-abortar:hover {

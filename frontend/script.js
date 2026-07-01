@@ -151,6 +151,15 @@ async function iniciarOperacion() {
     
     reproducirSonidoInicioEscaneo(); // Blip de confirmación: "escaneo activado"
 
+    // Mostrar el botón de abortar al arrancar la operación
+    botonAbortar.style.display = 'block';
+
+    // 2. APAGAMOS EL "ESPERANDO OBJETIVO" AL INSTANTE EN LOS 4 PANELES
+    panelVista.classList.remove('esperando');
+    panelTech.classList.remove('esperando');
+    panelEnlaces.classList.remove('esperando');
+    panelMetricas.classList.remove('esperando');
+
     // SEGURIDAD: Si el usuario aprieta "Escanear" 2 veces rápido, cancelamos 
     // las peticiones anteriores para no saturar nuestro propio servidor.
     if (controladorPeticion) {
@@ -177,12 +186,18 @@ async function iniciarOperacion() {
         panelTech.innerHTML = '';
         panelMetricas.innerHTML = '';
         panelEnlaces.innerHTML = '';
-        panelMetricas.innerHTML = '';
+
+        panelTech.classList.add('esperando');
+        panelEnlaces.classList.add('esperando');
+        panelMetricas.classList.add('esperando');
+        
+        botonAbortar.style.display = 'none'; // Ocultamos el botón abortar
         reproducirSonidoDerrota(); // Sonido de error: la URL ni siquiera tiene forma válida
 
-        // Sensor para limpiar al hacer clic sobre el mensaje de error y volver a enfocar el input.
+        // Sensor para limpiar al hacer clic sobre el mensaje de error y volver a enfocar el input. Y vuelve a aparecer el mensaje de "esperando objetivo" en los otros paneles.
         panelVista.querySelector('span').addEventListener('click', () => {
             panelVista.innerHTML = '';
+            panelVista.classList.add('esperando'); 
             inputObjetivo.value = '';
             inputObjetivo.focus();
         });
@@ -222,7 +237,15 @@ async function iniciarOperacion() {
             panelVista.innerHTML = `<span style="color: var(--color-alerta)">[ERROR: ${datos.error}]</span>`;
             panelTech.innerHTML = '';
             panelMetricas.innerHTML = '';
-            reproducirSonidoDerrota(); // Sonido de error: el backend rechazó la operación
+            panelEnlaces.innerHTML = '';
+
+            // Si el servidor falla, vuelven a "Esperando..."
+            panelTech.classList.add('esperando');
+            panelEnlaces.classList.add('esperando');
+            panelMetricas.classList.add('esperando');
+            
+            botonAbortar.style.display = 'none';
+            reproducirSonidoDerrota();  // Sonido de error: el backend rechazó la operación
             return;
         }
         
@@ -269,27 +292,43 @@ async function iniciarOperacion() {
         panelMetricas.innerHTML = `<ul style="list-style: none; padding: 0; margin: 0;"><li>LATENCIA: <span style="color: var(--color-terminal)">${datos.metricas.tiempoRespuestaMs}ms</span></li><li>PESO TOTAL: <span style="color: var(--color-terminal)">${datos.metricas.pesoDocumentoKb} KB</span></li><li>ESTADO SSL: <span style="color: var(--color-terminal)">${estadoSsl}</span></li></ul>`;
 
         reproducirSonidoVictoria(); // Sonido de éxito: los 4 paneles ya se llenaron con datos reales
+        botonAbortar.style.display = 'none'; // Oculta el botón tras el éxito
 
     
     // 8 GESTIÓN DE EXCEPCIONES Y ABORTOS
     
     } catch (error) {
-        // Si el error ocurrió porque nosotros tocamos el botón "Abortar"...
         if (error.name === 'AbortError') {
-            panelVista.innerHTML = `<span style="color: var(--color-alerta)">[OPERACIÓN CANCELADA POR EL OPERADOR]</span>`;
-            // Nota: acá NO suena la derrota a propósito. Cancelar fue una decisión 
-            // del usuario, no un fallo del sistema, así que no tiene sentido "castigarlo".
+            // Le agregué "cursor: pointer;" para que el mouse se ponga con la manito y el usuario sepa que puede clickearlo
+            panelVista.innerHTML = `<span style="color: var(--color-alerta); cursor: pointer;" title="Clic para limpiar">[OPERACIÓN CANCELADA POR EL OPERADOR]</span>`;
         } else {
-            // Si el error es real (ej: el backend está apagado o no hay internet).
-            panelVista.innerHTML = `<span style="color: var(--color-alerta)">[FALLO DE CONEXIÓN CON BÚNKER CENTRAL]</span>`;
-            console.error(error); // Guarda el error feo en la consola oculta para el programador.
-            reproducirSonidoDerrota(); // Sonido de error: no hubo forma de completar el escaneo
+            panelVista.innerHTML = `<span style="color: var(--color-alerta); cursor: pointer;" title="Clic para limpiar">[FALLO DE CONEXIÓN CON BÚNKER CENTRAL]</span>`;
+            console.error(error); 
+            reproducirSonidoDerrota(); 
         }
-        // Ante un fallo, asegura que los demás paneles queden limpios.
+        
+        // Si hay error o abortamos, limpiamos los demás paneles
         panelTech.innerHTML = '';
+        panelEnlaces.innerHTML = '';
         panelMetricas.innerHTML = '';
+        
+        // Y los volvemos al estado de espera
+        panelTech.classList.add('esperando');
+        panelEnlaces.classList.add('esperando');
+        panelMetricas.classList.add('esperando');
+        
+        // EL ESCANEO FALLÓ O SE CANCELÓ: Ocultamos el botón abortar
+        botonAbortar.style.display = 'none'; 
+
+        // NUEVO: Agregamos el sensor para que si hacen clic en el error, el panel se limpie y vuelva a "Esperando..."
+        panelVista.querySelector('span').addEventListener('click', () => {
+            panelVista.innerHTML = '';
+            panelVista.classList.add('esperando'); 
+            inputObjetivo.value = '';
+            inputObjetivo.focus();
+        });
     }
-}
+} // <-- Fin de la función iniciarOperacion()
 
 
 // 9 MODO FOCO (estilo llamada de Discord)
