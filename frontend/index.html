@@ -15,6 +15,7 @@
             <input type="url" id="target-url" placeholder="https://"> <!-- Input para ingresar la URL del objetivo -->
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
             <button id="btn-abortar">[ABORTAR]</button>
+<<<<<<< HEAD
 
             <div class="selector-color-grupo"> <!-- Agrupa el botón de tres puntitos y la paleta, para poder ubicar el desplegable justo debajo -->
                 <button type="button" id="btn-paleta" title="Colores" aria-haspopup="true" aria-expanded="false">⋮</button> <!-- Único control visible: abre/cierra la paleta -->
@@ -29,6 +30,9 @@
                     <input type="color" id="color-picker" value="#00ff41" class="color-picker-invisible" title="Elegí un color personalizado">
                 </div>
             </div>
+=======
+            <button id="btn-menu">[MENÚ]</button>
+>>>>>>> 75cdd5a8a3eb3b9d93836556fb700667c8dd4086
         </header>
 
         <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->
@@ -59,7 +63,29 @@
                 <!-- Aca se mostraran las metricas (cantidad de imagenes, peso de la pagina, tiempo de carga, cantidad de scripts, etc) -->
             </section>
 
-        </main>
+        </main> <!-- Menu Lateral-->
+        <div>
+            <aside id="menu-lateral">
+        <div class="menu-header">
+            <h2 class="panel-titulo">[PANEL DE CONTROL]</h2>
+            <button id="btn-cerrar-menu">[X]</button>
+        </div>
+        
+        <div class="menu-seccion">
+            <h3>[TEMA VISUAL]</h3>
+            <div class="color-picker-marco">
+                <input type="color" id="color-picker-menu" value="#00ff41" title="Elegí el color del tema">
+            </div>
+        </div>
+
+        <div class="menu-seccion scroll-activo" style="flex-grow: 1;">
+            <h3>[HISTORIAL DE BÚSQUEDAS]</h3>
+            <ul id="lista-historial">
+                <li style="color: var(--color-terminal); opacity: 0.5;">[HISTORIAL VACÍO]</li>
+            </ul>
+        </div>
+    </aside>
+        </div>
 
     </div>
     <script src="matrix.js"></script>

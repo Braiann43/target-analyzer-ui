@@ -1,5 +1,5 @@
 /* ==========================================================================
-   VARIABLES GLOBALES
+   VARIABLES GLOBALESS
    El :root es la raíz de todo. Estas son las "etiquetas" con colores y estilos, aca definimos las variables globales por asi decirlo, las cuales las podemos usar en todo momento mas adelante en el codigo, y si queremos cambiar un color o estilo, solo tenemos que cambiarlo aca y se va a actualizar
    ========================================================================== */
 
@@ -117,6 +117,7 @@ body {
     background-color: #1a0000; /* Fondo casi negro con tinte rojo */
     color: #ff3b3b; /* Letras rojas */
     border: 1px solid #ff3b3b; /* Borde rojo fino */
+    display: none; /* Ocultamos el boton antes de iniciar escaneo */
 }
 
 #btn-abortar:hover {
@@ -127,6 +128,7 @@ body {
 
 /* ==========================================================================
    SELECTOR DE COLOR (personalización del tema)
+<<<<<<< HEAD
    La opción "Colores" es un botón de texto más, del ancho de toda la fila,
    dentro del desplegable de los 3 puntitos. Al clickearlo, se dispara por 
    JS el input nativo (invisible) y se abre la ruedita de colores del 
@@ -159,6 +161,29 @@ body {
     width: 0;
     height: 0;
     padding: 0;
+=======
+   ========================================================================== */
+.color-picker-marco {
+    display: inline-block; /* LA CLAVE: Evita que el marco se estire hacia la derecha */
+    width: 40px; 
+    height: 40px;
+    border: var(--borde-panel); 
+    border-radius: 4px; 
+    overflow: hidden; 
+    cursor: pointer;
+    transition: 0.3s; 
+    flex-shrink: 0; 
+}
+
+/* Brillo al pasar el mouse */
+.color-picker-marco:hover {
+    box-shadow: var(--sombra-activa);
+}
+
+#color-picker-menu {
+    -webkit-appearance: none; 
+    appearance: none;
+>>>>>>> 75cdd5a8a3eb3b9d93836556fb700667c8dd4086
     border: none;
     opacity: 0;
     pointer-events: none;
@@ -186,6 +211,7 @@ body {
     line-height: 1;
     padding: 0;
     cursor: pointer;
+<<<<<<< HEAD
     border-radius: 4px;
     transition: 0.3s;
 }
@@ -215,6 +241,14 @@ body {
    le pone el atributo hidden (o sea, hasta que se haga clic en los 3 puntitos). */
 .paleta-colores[hidden] {
     display: none;
+=======
+    /* Hacemos el input más grande que el marco para esconder los bordes nativos */
+    width: 60px; 
+    height: 60px;
+    /* Lo empujamos hacia arriba y la izquierda para que quede centrado en el marco */
+    margin: -10px; 
+    background-color: transparent; 
+>>>>>>> 75cdd5a8a3eb3b9d93836556fb700667c8dd4086
 }
 
 /* ==========================================================================
@@ -409,4 +443,80 @@ body {
     transform: scale(1.05); /* Se agranda apenas, como las miniaturas de Discord */
     box-shadow: var(--sombra-activa);
     z-index: 5; /* Para que al agrandarse no quede tapada por las vecinas */
+}
+
+/* ==========================================================================
+   MENÚ LATERAL (PANEL DE CONTROL)
+   ========================================================================== */
+#menu-lateral {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Lo esconde fuera de la pantalla por defecto */
+    width: 320px;
+    height: 100vh;
+    background-color: rgba(5, 5, 5, 0.95); /* Fondo oscuro semi-transparente */
+    border-left: var(--borde-panel);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.9);
+    z-index: 100; /* Asegura que pase por encima de los paneles y la matrix */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    transition: right 0.4s ease-in-out; /* Animación suave al abrir/cerrar */
+}
+
+/* Clase que le agregaremos con JS para que el menú entre a la pantalla */
+#menu-lateral.abierto {
+    right: 0;
+}
+
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#btn-cerrar-menu {
+    background: transparent;
+    color: var(--color-alerta);
+    border: 1px solid var(--color-alerta);
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+#btn-cerrar-menu:hover {
+    background: var(--color-alerta);
+    color: #000;
+}
+
+.menu-seccion h3 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--color-terminal);
+    padding-bottom: 5px;
+}
+
+#lista-historial {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.item-historial {
+    border: var(--borde-panel);
+    padding: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    background-color: rgba(0, 255, 65, 0.05);
+    word-break: break-all;
+    transition: 0.2s;
+}
+
+.item-historial:hover {
+    background-color: var(--color-terminal);
+    color: #000;
+    box-shadow: var(--sombra-neon);
 }
