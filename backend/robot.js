@@ -22,8 +22,16 @@ async function ejecutarExtraccion(urlObjetivo, timeoutMs = 20000) {
         // Registramos la marca de tiempo inicial para calcular la latencia posterior
         const tiempoInicio = Date.now();
 
+        // Navegamos esperando a que el DOM y los scripts sincrónicos ya se hayan
+        // ejecutado. ANTES usábamos 'networkidle2' (esperar a que la red quede
+        // "en silencio", con 2 conexiones o menos durante 500ms), pero eso rompe
+        // en sitios reales: analytics, chats en vivo, widgets de redes sociales,etc.
+        // 'domcontentloaded': solo exige que el árbol DOM esté listo
+        // es más que suficiente para leer título, metadatos y headers.
+
+
         // Navegamos esperando a que el tráfico de red se estabilice
-        const respuestaRed = await pagina.goto(urlObjetivo, { waitUntil: 'networkidle2' });
+        const respuestaRed = await pagina.goto(urlObjetivo, { waitUntil: 'domcontentloaded' });
         // Extraemos la fotografía estática del DOM ya renderizado por el motor V8
         const codigoHtml = await pagina.content();
 

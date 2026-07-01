@@ -27,7 +27,7 @@ app.use(express.json());  // Para poder leer el JSON que manda el fetch del fron
 // tal cual a robot.js, que lo usa como techo de navegación de Puppeteer: así el
 // timeout se dispara DENTRO de Chrome (que se cierra solo y prolijo), en vez de
 // que nosotros cortemos la espera desde afuera y dejemos el Chrome huérfano.
-const TIMEOUT_MS = 20000;
+const TIMEOUT_MS = 30000;
 
 // --------------------------------------------------------------------------
 // ENDPOINT PRINCIPAL
