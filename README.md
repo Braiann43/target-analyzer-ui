@@ -33,7 +33,7 @@ Sigue estos pasos para correr el búnker central en tu máquina local:
 **1. Clonar el repositorio**
 
 ```bash
-git clone https://github.com/TU_USUARIO/target-analyzer.git
+git clone https://github.com/Braiann43/target-analyzer.git
 cd backend
 ```
 
