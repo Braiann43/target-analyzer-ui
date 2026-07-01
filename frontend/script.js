@@ -630,3 +630,69 @@ btnAbortar.addEventListener('click', () => {
     progresoTexto.textContent = '[ESCANEO_ABORTADO]';
     progresoTexto.style.color = '#ff3b3b'; // Lo ponemos en rojo
 });
+// ==========================================================================
+// 12 EXPORTAR REPORTES (TXT Y HTML) - [LO NUEVO DE LA FUSIÓN]
+// Con esta magia descargamos archivos directamente desde el navegador 
+// ==========================================================================
+
+const btnExportTxt = document.getElementById('btn-export-txt');
+const btnExportHtml = document.getElementById('btn-export-html');
+
+// Función que crea un archivo fantasma y simula un click para descargarlo
+function descargarArchivo(nombre, contenido, tipoMime) {
+    const enlace = document.createElement('a'); // Creamos un link invisible en el HTML
+    const archivo = new Blob([contenido], { type: tipoMime }); // Armamos el paquete de datos puros (Blob)
+    enlace.href = URL.createObjectURL(archivo); // Le inventamos una ruta temporal
+    enlace.download = nombre; // Le decimos cómo se va a llamar el archivo
+    enlace.click(); // Simulamos que el usuario le hace click para que se baje a la PC
+}
+
+if (btnExportTxt) {
+    btnExportTxt.addEventListener('click', () => {
+        // Juntamos todo el texto crudo de los paneles para el bloc de notas
+        const url = inputObjetivo.value || "Objetivo_Desconocido";
+        const vista = panelVista.innerText || "Sin datos";
+        const tech = panelTech.innerText || "Sin datos";
+        const metricas = panelMetricas.innerText || "Sin datos";
+        
+        // Armamos el texto lindo con saltos de línea (\n)
+        const textoFinal = `=== REPORTE TARGET ANALYZER ===\nURL: ${url}\n\n[VISTA]\n${vista}\n\n[TECNOLOGIAS]\n${tech}\n\n[METRICAS]\n${metricas}`;
+        
+        // Llamamos a la función mágica de arriba mandándole formato de texto plano
+        descargarArchivo('reporte_ataque.txt', textoFinal, 'text/plain');
+    });
+}
+
+if (btnExportHtml) {
+    btnExportHtml.addEventListener('click', () => {
+        // Para el HTML, directamente le robamos el código visual a la grilla de la web
+        const contenidoHTML = document.querySelector('.paneles-grid').innerHTML;
+        
+        // Le armamos un esqueleto básico para que se vea verde y negro al abrirlo
+        const paginaHTML = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Reporte Target Analyzer</title>
+            <style>
+                body { background: #050505; color: #00ff41; font-family: monospace; padding: 20px; }
+                .panel-bunker { border: 1px solid #00ff41; padding: 15px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,255,65,0.2); }
+                .panel-titulo { border-bottom: 1px dashed #00ff41; padding-bottom: 5px; }
+                ul { list-style: none; padding: 0; }
+                li { margin-bottom: 8px; }
+            </style>
+        </head>
+        <body>
+            <h1>[REPORTE TARGET ANALYZER]</h1>
+            <p><strong>OBJETIVO:</strong> ${inputObjetivo.value || "No especificado"}</p>
+            <hr style="border-color: #00ff41; margin-bottom: 20px;">
+            ${contenidoHTML}
+        </body>
+        </html>
+        `;
+        
+        // Lo bajamos como archivo HTML
+        descargarArchivo('reporte_ataque.html', paginaHTML, 'text/html');
+    });
+}
