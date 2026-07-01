@@ -24,8 +24,19 @@ const columnas = Math.floor(canvas.width / tamanoFuente); // Cuantas columnas en
 const gotas = Array(columnas).fill(1).map(() => Math.random() * -100);
 
 // Lee el color verde directo de tus variables CSS, para que siempre haga juego
-const colorTerminal = getComputedStyle(document.documentElement)
+// Es 'let' (y no 'const') porque ahora este color puede cambiar en caliente
+// cuando el usuario elija un color nuevo desde el selector de la consola.
+let colorTerminal = getComputedStyle(document.documentElement)
     .getPropertyValue('--color-terminal').trim();
+
+// Vuelve a leer la variable CSS y actualiza el color de la lluvia.
+// La dejamos "colgada" en window para que script.js pueda llamarla
+// apenas el usuario elija un color nuevo en el selector.
+function actualizarColorMatrix() {
+    colorTerminal = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-terminal').trim();
+}
+window.actualizarColorMatrix = actualizarColorMatrix;
 
 function dibujar() {
     // Dibuja un rectangulo negro semi-transparente encima de todo el canvas

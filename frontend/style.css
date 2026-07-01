@@ -5,11 +5,12 @@
 
 :root {
     --fondo-absoluto: #050505; /* Crea un color negro para el fondo de la pantalla */
-    --color-terminal: #00ff41; /* Crea un verde neon */
-    --color-alerta: #f2ff00;   /* Crea un color (naranja/amarillo) para los avisos */
-    --borde-panel: 1px solid #00ff41; /* Guarda el estilo de una linea verde finita de 1 px  */
-    --sombra-neon: 0 0 10px rgba(0, 255, 65, 0.2); /* Guarda un efecto de brillo verde muy suave */
-    --sombra-activa: 0 0 15px rgba(0, 255, 65, 0.6); /* Guarda un brillo verde mas fuerte para cuando escribimos */
+    --color-terminal: #00ff41; /* Crea un verde neon (color base, se puede cambiar en vivo desde el selector de color) */
+    --color-terminal-rgb: 0, 255, 65; /* Los mismos 3 numeritos (R,G,B) del color de arriba, separados por comas. Los necesitamos asi sueltos para poder armar sombras con transparencia (rgba) sin importar que color elija el usuario */
+    --color-alerta: #f2ff00;   /* Crea un color (naranja/amarillo) para los avisos. Se mantiene fijo para que los errores siempre se distingan del tema elegido */
+    --borde-panel: 1px solid var(--color-terminal); /* Guarda el estilo de una linea finita de 1 px, ahora apuntando al color elegido */
+    --sombra-neon: 0 0 10px rgba(var(--color-terminal-rgb), 0.2); /* Guarda un efecto de brillo suave, armado con los componentes RGB */
+    --sombra-activa: 0 0 15px rgba(var(--color-terminal-rgb), 0.6); /* Guarda un brillo mas fuerte para cuando escribimos, mismo truco */
 }
 
 /* ==========================================================================
@@ -111,6 +112,55 @@ body {
     transform: scale(1.02); /* Agranda el botón un 2% para dar el efecto de que "sale" de la pantalla. */
 }
 
+/* Botón rojo de abortar, para diferenciarlo visualmente del verde de escaneo */
+#btn-abortar {
+    background-color: #1a0000; /* Fondo casi negro con tinte rojo */
+    color: #ff3b3b; /* Letras rojas */
+    border: 1px solid #ff3b3b; /* Borde rojo fino */
+}
+
+#btn-abortar:hover {
+    background-color: #ff3b3b; /* Al pasar el mouse, se invierte: fondo rojo */
+    color: #000; /* Letras negras */
+    box-shadow: 0 0 15px #ff3b3b; /* Brillo rojo */
+}
+
+/* ==========================================================================
+   SELECTOR DE COLOR (personalización del tema)
+   El cuadradito donde el usuario elige el color de toda la interfaz
+   ========================================================================== */
+#color-picker {
+    -webkit-appearance: none; /* Le saca el estilo feo por defecto del navegador */
+    appearance: none;
+    width: 38px; /* Lo hace cuadrado y chiquito */
+    height: 38px;
+    padding: 0;
+    border: var(--borde-panel); /* Usa el mismo borde verde (o el color elegido) que el resto */
+    border-radius: 4px; /* Le redondea apenas las puntas */
+    background: transparent;
+    cursor: pointer; /* Manito de clic */
+    transition: 0.3s; /* Para que el brillo del hover sea suave */
+}
+
+/* Le saca el relleno interno feo que trae Chrome/Edge en el cuadradito de color */
+#color-picker::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+#color-picker::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+/* Version Firefox del cuadradito interno */
+#color-picker::-moz-color-swatch {
+    border: none;
+    border-radius: 2px;
+}
+
+/* Brillo al pasar el mouse, igual que el resto de los controles de la consola */
+#color-picker:hover {
+    box-shadow: var(--sombra-activa);
+}
+
 /* ==========================================================================
    GRILLA TÁCTICA
    El contenedor que aloja los 4 paneles de informacion
@@ -133,6 +183,15 @@ body {
     box-shadow: var(--sombra-neon); /* Brillo verde sutil en cada caja */
     display: flex; /* Prende Flexbox aca adentro para ordenar el titulo y el contenido */
     flex-direction: column; /* Apila el titulo arriba y el contenido abajo */
+    cursor: pointer; /* Avisa que el panel se puede clickear */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; /* Anima de forma suave el agrandado, el brillo y el apagado/prendido */
+}
+
+/* Al pasar el cursor por encima, el panel crece un poquito y se prende */
+.panel-bunker:hover {
+    transform: scale(1.03); /* Agranda el panel un 3% */
+    box-shadow: var(--sombra-activa); /* Le sube el brillo verde */
+    z-index: 2; /* Para que no quede tapado por los paneles vecinos al crecer */
 }
 
 /* Diseño de cada titulo de los paneles */
@@ -183,6 +242,15 @@ body {
     .panel-bunker {
         min-height: 250px; /* Evita que en un celular los paneles se encimen */
     }
+
+    /* En modo foco, en celular dejamos que las 3 ventanitas usen menos ancho cada una y se pueda hacer scroll horizontal si hace falta */
+    .paneles-grid.modo-foco {
+        grid-template-rows: 1fr 90px; /* Achicamos un poco la franja de abajo */
+    }
+
+    .paneles-grid.modo-foco .panel-minimizado .panel-titulo {
+        font-size: 0.65rem; /* Letra más chica todavía para que entre en pantallas angostas */
+    }
 }
 
 /* ==========================================================================
@@ -197,11 +265,6 @@ body {
     height: 100%;
     z-index: -1; /* Lo manda atras de todo el contenido, para que quede de fondo */
     opacity: 0.35; /* Lo apaga un poco para que no moleste la lectura de los paneles */
-}
-
-.esperando::after {
-    content: '';
-    animation: tipeo-espera 3s steps(1) infinite;
 }
 
 .esperando::after {
@@ -240,73 +303,53 @@ body {
     96%  { content: 'Esperando objetivo...'; }
     100% { content: ''; }
 }
+
 /* ==========================================================================
    MODO FOCO (estilo llamada de Discord)
+   Se activa con JS cuando el usuario hace clic en un panel.
+   Usamos Grid (en vez de Flexbox en columna) para poder armar 2 filas:
+   arriba la ventana grande, abajo una FILA con las 3 ventanitas chicas
+   una al lado de la otra, en vez de apiladas como una lista.
    ========================================================================== */
 
-.panel-bunker {
-    cursor: pointer; /* Para que se note que se puede clickear */
-    transition: all 0.4s ease; /* Anima TODO el cambio: tamaño, posición, todo */
-    cursor: pointer;                              
-    transition: all 0.4s ease;                    
-}
-
-/* Cuando la grilla está en modo-foco, dejamos de usar Grid y pasamos a Flexbox en columna */
 .paneles-grid.modo-foco {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 1fr 130px; /* Fila 1: la grande y flexible. Fila 2: franja fija de 130px para las chicas */
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales, una por cada ventanita minimizada */
     gap: 15px;
 }
 
-/* El panel que clickeaste ocupa casi toda la pantalla */
+/* El panel que clickeaste ocupa toda la fila de arriba, de punta a punta */
 .paneles-grid.modo-foco .panel-expandido {
-    flex: 1; /* Se come todo el espacio vertical disponible */
-    order: 1; /* Lo obliga a ir primero (arriba), como en Discord */
+    grid-row: 1;
+    grid-column: 1 / -1; /* Se estira desde la primera columna hasta la última */
 }
 
-/* Los otros 3 paneles se achican y se ponen en fila abajo */
+/* Los otros 3 paneles caen en la fila de abajo, cada uno en su propia columna (como ventanitas separadas) */
 .paneles-grid.modo-foco .panel-minimizado {
-    flex: 0 0 90px; /* Altura fija chiquita, no crece ni se achica más */
-    order: 2; /* Los manda después del grande */
-    opacity: 0.7; /* Los apaga un poco visualmente, como inactivos */
+    grid-row: 2;
+    opacity: 0.75; /* Los apaga un poco visualmente, como inactivos */
+    overflow: hidden; /* Si el título no entra, lo recorta en vez de romper la ventanita */
 }
 
-/* Como hay poco espacio, ocultamos el texto largo y dejamos solo el título */
+/* Dentro de cada ventanita chica, achicamos el título para que entre mejor */
+.paneles-grid.modo-foco .panel-minimizado .panel-titulo {
+    font-size: 0.75rem;
+    padding: 8px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Como hay poco espacio, ocultamos el texto largo de adentro */
 .paneles-grid.modo-foco .panel-minimizado .contenido-panel {
     display: none;
 }
 
-/* Si pasás el mouse por un panel chiquito, se nota más que es clickeable */
+/* Si pasás el mouse por una ventanita chica, se nota más que es clickeable */
 .paneles-grid.modo-foco .panel-minimizado:hover {
     opacity: 1;
+    transform: scale(1.05); /* Se agranda apenas, como las miniaturas de Discord */
     box-shadow: var(--sombra-activa);
-}
-/* ==========================================================================
-   MODO FOCO (estilo llamada de Discord)
-   ========================================================================== */
-
-.paneles-grid.modo-foco {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.paneles-grid.modo-foco .panel-expandido {
-    flex: 1;
-    order: 1;
-}
-
-.paneles-grid.modo-foco .panel-minimizado {
-    flex: 0 0 90px;
-    order: 2;
-    opacity: 0.7;
-}
-
-.paneles-grid.modo-foco .panel-minimizado .contenido-panel {
-    display: none;
-}
-
-.paneles-grid.modo-foco .panel-minimizado:hover {
-    opacity: 1;
-    box-shadow: var(--sombra-activa);
+    z-index: 5; /* Para que al agrandarse no quede tapada por las vecinas */
 }

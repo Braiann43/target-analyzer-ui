@@ -173,6 +173,11 @@ async function iniciarOperacion() {
         panelMetricas.innerHTML = '';
     }
 }
+
+
+// 9 MODO FOCO (estilo llamada de Discord)
+// Al hacer clic en un panel, ese se agranda y los otros 3 se minimizan abajo.
+
 // Agarramos TODOS los paneles de una sola vez
 const paneles = document.querySelectorAll('.panel-bunker');
 const grilla = document.querySelector('.paneles-grid');
@@ -202,4 +207,51 @@ paneles.forEach(panel => {
             }
         });
     });
+});
+
+
+// 10 SELECTOR DE COLOR (personalización del tema)
+// Permite al usuario elegir el color de toda la interfaz a su gusto
+
+const selectorColor = document.getElementById('color-picker');
+
+// Convierte un color hexadecimal (ej: "#00ff41") en sus 3 componentes
+// numéricos R, G, B separados por comas (ej: "0, 255, 65").
+// Esto es lo que necesitan las sombras en rgba() para poder agregarles transparencia.
+function hexARgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r}, ${g}, ${b}`;
+}
+
+// Aplica un color nuevo a toda la web, actualizando las variables CSS globales.
+function aplicarColorTema(hex) {
+    // Cambia el color base. Como el resto del CSS (bordes, texto, sombras) 
+    // está armado con var(--color-terminal), todo se actualiza solo, en vivo.
+    document.documentElement.style.setProperty('--color-terminal', hex);
+    
+    // Cambia también la version "RGB suelta", que es la que usan las sombras con transparencia.
+    document.documentElement.style.setProperty('--color-terminal-rgb', hexARgb(hex));
+
+    // Avisa a la lluvia Matrix de fondo que tiene que repintarse con el color nuevo.
+    if (window.actualizarColorMatrix) {
+        window.actualizarColorMatrix();
+    }
+
+    // Guarda la elección en el navegador, para que la próxima vez que el 
+    // usuario entre a la página, se mantenga el color que eligió.
+    localStorage.setItem('colorTema', hex);
+}
+
+// Si el usuario ya había elegido un color en una visita anterior, lo recuperamos al cargar la página.
+const colorGuardado = localStorage.getItem('colorTema');
+if (colorGuardado) {
+    aplicarColorTema(colorGuardado);
+    selectorColor.value = colorGuardado; // Sincroniza el cuadradito de color con el valor guardado
+}
+
+// Cada vez que el usuario mueve el selector y elige un color nuevo, lo aplicamos al instante.
+selectorColor.addEventListener('input', (evento) => {
+    aplicarColorTema(evento.target.value);
 });

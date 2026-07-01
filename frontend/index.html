@@ -11,9 +11,12 @@
     <div class="bunker-container"> <!-- Envuelve toda la aplicacion, sirve para (centrado, fondo, margin, etc)-->
 
         <header id="consola-input"> <!-- Es la barra de control donde el usuario ingresa la URL -->
-            <label for="url-input" class="prompt-text">[TARGET_URL]:</label> <!-- Etiqueta descriptiva del campo de texto -->
+            <label for="target-url" class="prompt-text">[TARGET_URL]:</label> <!-- Etiqueta descriptiva del campo de texto -->
             <input type="url" id="target-url" placeholder="https://"> <!-- Input para ingresar la URL del objetivo -->
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
+            <button id="btn-abortar">[ABORTAR]</button>
+            <label for="color-picker" class="prompt-text">[COLOR]:</label> <!-- Etiqueta del selector de color -->
+            <input type="color" id="color-picker" value="#00ff41" title="Elegí el color del tema"> <!-- El usuario elige acá el color de toda la interfaz -->
         </header>
 
         <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->
@@ -34,7 +37,7 @@
 
             <section class="panel-bunker" id="panel-enlaces">
                 <h2 class="panel-titulo">PANEL 3: [ENLACES]</h2>
-                <div class="contenido-panel esperando"></div>
+                <div class="contenido-panel scroll-activo esperando"></div>
                 <!-- Aca se mostraran los enlaces encontrados en la web objetivo, solo que con un scroll activo para manejar grandes cantidades de enlaces -->
             </section>
 
