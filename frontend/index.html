@@ -7,12 +7,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="matrix-rain"></canvas> <!-- fondo tipo hacker de las peliculas -->
-    <div class="bunker-container"> <!-- la caja principal que guarda todo  -->
+    <canvas id="matrix-rain"></canvas> <!-- fondo animado de la pagina (lluvia de carecteres estilo matrix) -->
+    <div class="bunker-container"> <!-- Envuelve toda la aplicacion, sirve para (centrado, fondo, margin, etc)-->
 
-        <header id="consola-input"> <!-- aca va el link -->
-            <label for="target-url" class="prompt-text">[TARGET_URL]:</label> <!-- el textito del costado -->
-            <input type="url" id="target-url" placeholder="https://"> <!-- aca se escribe -->
+        <header id="consola-input"> <!-- Es la barra de control donde el usuario ingresa la URL -->
+            <label for="target-url" class="prompt-text">[TARGET_URL]:</label> <!-- Etiqueta descriptiva del campo de texto -->
+            <input type="url" id="target-url" placeholder="https://"> <!-- Input para ingresar la URL del objetivo -->
             <button id="btn-scan">[INICIAR_ESCANEO]</button>
             <button id="btn-abortar">[ABORTAR]</button>
             <button id="btn-menu">[MENÚ]</button>
@@ -23,37 +23,35 @@
             </div>
         </header>
 
-        <main class="paneles-grid"> <!-- la grilla para que quede todo ordenadito -->
+        <main class="paneles-grid"> <!-- Contenedor principal que organiza los paneles en una cuadrícula -->
 
-            <!-- uso la clase panel-bunker para no escribir mil veces lo mismo en el css xd -->
+            <!-- Aca utilizamos la clase "panel-bunker" para aplicar estilos comunes a todos los paneles, y cada panel tiene un ID unico para su contenido especifico, y la class "contenido-panel" para el contenido interno, que se presentara desde JavaScript -->
 
             <section class="panel-bunker" id="panel-vista">   
                 <h2 class="panel-titulo">PANEL 1: [VISTA]</h2>   
                 <div class="contenido-panel esperando"></div>
-                <!-- aca va la foto de la pagina -->
+                <!-- Aca se mostrara la vista/screenshot de la web scrapeada -->
             </section>
 
             <section class="panel-bunker" id="panel-tech">
                 <h2 class="panel-titulo">PANEL 2: [TECNOLOGÍAS]</h2>
                 <div class="contenido-panel esperando"></div>
-                <!-- aca tira con que hicieron la pagina (ni idea como funciona nodejs) -->
+                <!-- Aca se mostraran las tecnologias detectadas en la web objetivo (frameworks, librerías, servidor, etc) Una vez que Node.js analice los headers y el HTML -->
             </section>
 
             <section class="panel-bunker" id="panel-enlaces">
                 <h2 class="panel-titulo">PANEL 3: [ENLACES]</h2>
                 <div class="contenido-panel scroll-activo esperando"></div>
-                <!-- aca van los links. le meti scroll porque a veces son como 500 y se rompia toda la pagina -->
+                <!-- Aca se mostraran los enlaces encontrados en la web objetivo, solo que con un scroll activo para manejar grandes cantidades de enlaces -->
             </section>
 
             <section class="panel-bunker" id="panel-metricas">
                 <h2 class="panel-titulo">PANEL 4: [MÉTRICAS]</h2>
                 <div class="contenido-panel esperando"></div>
-                <!-- aca van los datos esos de peso y tiempo de carga -->
+                <!-- Aca se mostraran las metricas (cantidad de imagenes, peso de la pagina, tiempo de carga, cantidad de scripts, etc) -->
             </section>
 
-        </main> 
-        
-        <!-- el menu del costado que esta escondido -->
+        </main> <!-- Menu Lateral-->
         <div>
             <aside id="menu-lateral">
         <div class="menu-header">
@@ -65,6 +63,26 @@
             <h3>[TEMA VISUAL]</h3>
             <div class="color-picker-marco">
                 <input type="color" id="color-picker-menu" value="#00ff41" title="Elegí el color del tema">
+            </div>
+        </div>
+
+        <div class="menu-seccion">
+            <h3>[TAMAÑO DE FUENTE]</h3>
+            <div class="selector-fuente" id="selector-fuente">
+                <button class="btn-fuente" data-tamano="0.85rem" title="Chica">S</button>
+                <button class="btn-fuente" data-tamano="1rem" title="Normal">M</button>
+                <button class="btn-fuente" data-tamano="1.15rem" title="Grande">L</button>
+                <button class="btn-fuente" data-tamano="1.35rem" title="Enorme">XL</button>
+            </div>
+        </div>
+
+        <div class="menu-seccion">
+            <h3>[ESTILO DE FUENTE]</h3>
+            <div class="selector-fuente" id="selector-tipografia">
+                <button class="btn-fuente btn-tipografia" data-fuente="'Courier New', Courier, monospace" title="Máquina de escribir clásica">MONO</button>
+                <button class="btn-fuente btn-tipografia" data-fuente="Consolas, Monaco, monospace" title="Estilo consola moderna">CONSOLA</button>
+                <button class="btn-fuente btn-tipografia" data-fuente="Georgia, 'Times New Roman', serif" title="Estilo elegante con serifas">SERIF</button>
+                <button class="btn-fuente btn-tipografia" data-fuente="Arial, Helvetica, sans-serif" title="Estilo limpio y moderno">SANS</button>
             </div>
         </div>
 
