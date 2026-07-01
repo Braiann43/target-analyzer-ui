@@ -4,7 +4,7 @@
    ========================================================================== */
 
 :root {
-    --fondo-absoluto: #050505; /* Crea un color negro para el fondo de la pantalla */
+    --fondo-absoluto: #050505; /* Creaa un color negro para el fondo de la pantalla */
     --color-terminal: #00ff41; /* Crea un verde neon (color base, se puede cambiar en vivo desde el selector de color) */
     --color-terminal-rgb: 0, 255, 65; /* Los mismos 3 numeritos (R,G,B) del color de arriba, separados por comas. Los necesitamos asi sueltos para poder armar sombras con transparencia (rgba) sin importar que color elija el usuario */
     --color-alerta: #f2ff00;   /* Crea un color (naranja/amarillo) para los avisos. Se mantiene fijo para que los errores siempre se distingan del tema elegido */

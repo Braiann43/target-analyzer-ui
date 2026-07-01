@@ -24,7 +24,7 @@ const columnas = Math.floor(canvas.width / tamanoFuente); // Cuantas columnas en
 const gotas = Array(columnas).fill(1).map(() => Math.random() * -100);
 
 // Lee el color verde directo de tus variables CSS, para que siempre haga juego
-// Es 'let' (y no 'const') porque ahora este color puede cambiar en caliente
+// Es 'let' (y no 'const') porque ahoora este color puede cambiar en caliente
 // cuando el usuario elija un color nuevo desde el selector de la consola.
 let colorTerminal = getComputedStyle(document.documentElement)
     .getPropertyValue('--color-terminal').trim();

@@ -6,7 +6,7 @@ const inputObjetivo = document.getElementById('target-url');
 // Captura el botón verde para iniciar el ataque/escaneo.
 const botonEscaneo = document.getElementById('btn-scan');
 
-// Captura el nuevo botón rojo para abortar la misión en pleno escaneo.
+// Captura el nuevoo botón rojo para abortar la misión en pleno escaneo.
 const botonAbortar = document.getElementById('btn-abortar');
 
 // Captura las cajas de contenido de los 4 paneles.
