@@ -303,7 +303,31 @@ body {
     96%  { content: 'Esperando objetivo...'; }
     100% { content: ''; }
 }
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+.panel-bunker {
+    background-color: var(--fondo-absoluto);
+    border: var(--borde-panel);
+    box-shadow: var(--sombra-neon);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+    transform-origin: center;
+}
+
+.panel-bunker:hover {
+    transform: scale(1.03);
+    border-color: var(--color-alerta);
+    box-shadow: var(--sombra-activa);
+    z-index: 10;
+}
+
+=======
+>>>>>>> 51bbd1577dce853e2f4d8c5d1f9c2eda8d3c1ea1
 /* ==========================================================================
    MODO FOCO (estilo llamada de Discord)
    Se activa con JS cuando el usuario hace clic en un panel.
@@ -353,3 +377,36 @@ body {
     box-shadow: var(--sombra-activa);
     z-index: 5; /* Para que al agrandarse no quede tapada por las vecinas */
 }
+<<<<<<< HEAD
+=======
+/* ==========================================================================
+   MODO FOCO (estilo llamada de Discord)
+   ========================================================================== */
+
+.paneles-grid.modo-foco {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.paneles-grid.modo-foco .panel-expandido {
+    flex: 1;
+    order: 1;
+}
+
+.paneles-grid.modo-foco .panel-minimizado {
+    flex: 0 0 90px;
+    order: 2;
+    opacity: 0.7;
+}
+
+.paneles-grid.modo-foco .panel-minimizado .contenido-panel {
+    display: none;
+}
+
+.paneles-grid.modo-foco .panel-minimizado:hover {
+    opacity: 1;
+    box-shadow: var(--sombra-activa);
+}
+>>>>>>> 8ea912b17cfd2ae6ff6ff0826368bc0a40e1e663
+>>>>>>> 51bbd1577dce853e2f4d8c5d1f9c2eda8d3c1ea1
