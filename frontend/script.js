@@ -328,6 +328,9 @@ const aplicarVariable = (clave, valor, propCss) => {
     // con transparencia (rgba)
     if (clave === 'colorTema') {
         document.documentElement.style.setProperty('--color-terminal-rgb', `${parseInt(valor.slice(1, 3), 16)}, ${parseInt(valor.slice(3, 5), 16)}, ${parseInt(valor.slice(5, 7), 16)}`);
+
+        // avisamos a matrix.js que el color cambió, para que la lluvia también lo actualice
+        if (window.actualizarColorMatrix) window.actualizarColorMatrix();
     }
 };
 
