@@ -1,518 +1,151 @@
-/* Bueno, acá arriba pusimos las etiquetas que nos van a salvar de escribir lo mismo mil veces. Si un día queremos que nuestro bunker sea violeta en vez de verde, lo cambiamos solo acá. */
 :root {
-    --fondo-absoluto: #050505; /* un negro bien oscuro para toda la página */
-    --color-terminal: #00ff41; /* el clásico verde flúor tipo consola vieja */
-    --color-terminal-rgb: 0, 255, 65; /* esto son los números sueltos del verde, los re necesitamos para poder hacer que la sombrita sea medio transparente a veces */
-    --color-alerta: #f2ff00;   /* un amarillo fuerte para cuando las cosas fallan */
-    --borde-panel: 1px solid var(--color-terminal); /* el marquito finito para nuestras cajas */
-    --sombra-neon: 0 0 10px rgba(var(--color-terminal-rgb), 0.2); /* una sombrita piola para que no quede tan plano todo */
-    --sombra-activa: 0 0 15px rgba(var(--color-terminal-rgb), 0.6); /* esta es una sombra pero súper encendida para cuando queremos resaltar cosas */
-    --tamano-fuente-panel: 1rem; /* qué tan grandes van a estar las letras en las cajas (por ahora tamaño tranqui) */
-    --fuente-panel: 'Courier New', Courier, monospace; /* y acá le mandamos esa letra tipo máquina de escribir */
+    --fondo-absoluto: #050505;
+    --color-terminal: #00ff41;
+    --color-terminal-rgb: 0, 255, 65;
+    --color-alerta: #f2ff00;
+    --borde-panel: 1px solid var(--color-terminal);
+    --sombra-neon: 0 0 10px rgba(var(--color-terminal-rgb), 0.2);
+    --sombra-activa: 0 0 15px rgba(var(--color-terminal-rgb), 0.6);
+    --tamano-fuente-panel: 1rem;
+    --fuente-panel: 'Courier New', Courier, monospace;
 }
 
-/* Acá limpiamos toda la basura que te pone el navegador por defecto, arrancamos limpios de margencitos feos */
-* {
-    box-sizing: border-box; /* que los bordes no me desarmen mis medidas */
-    margin: 0; /* chao espacios por afuera */
-    padding: 0; /* chao espacios de relleno */
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Esto le da la facha de terminal hacker a toda la página y la pone justo en el medio, estemos donde estemos */
 body {
-    background-color: var(--fondo-absoluto); 
-    color: var(--color-terminal); 
-    font-family: 'Courier New', Courier, monospace; 
-    height: 100vh; /* le decimos "che agarrate toda la altura de la pantalla por favor" */
-    
-    /* Con flex juntamos y centramos todo al medio */
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-}
-
-/* Este contenedor enorme atrapa todo lo que hicimos y lo deja lindo acomodado en el centro */
-.bunker-container {
-    width: 95%; /* un toque más chiquito que la pantalla así respira a los costados */
-    max-width: 1200px; /* para que si tenés monitor gigante no quede súper estirado y deforme */
-    min-height: 90vh; /* casi todo lo alto */
-    display: flex; 
-    flex-direction: column; /* amontonamos la barra y las cajitas en pila, uno arriba del otro */
-    gap: 20px; /* aire entre cosas */
-    padding: 20px 0; /* airecito interno para arriba y abajo */
-}
-
-/* La barrita grandota de arriba donde escribimos qué vamos a analizar */
-#consola-input {
-    display: flex; 
-    flex-wrap: wrap; /* si abren esto desde el celu y no entra, que baje renglón sin romperse */
-    align-items: center; /* todos bien al medio */
-    gap: 15px; 
-    padding: 20px; 
-    border: var(--borde-panel); /* nuestro marquito verde */
-    box-shadow: var(--sombra-neon); /* brillito */
-    background-color: #0a0a0a; /* un toque más gris que el fondo negro así resalta */
-}
-
-/* Para que el cartelito que dice "TARGET_URL" quede gordito (negrita) */
-#consola-input label {
-    font-weight: bold; 
-}
-
-/* Donde se escribe, lo tuneamos un montón para que parezca consola posta */
-#consola-input input {
-    flex-grow: 1; /* lo obligamos a rellenar todo el vacío que le quede a la derecha */
-    background: transparent; /* chao fondo feo del navegador */
-    border: none; /* chao borde feo del navegador */
-    border-bottom: 1px solid var(--color-terminal); /* solo dejamos un subrayado verde re piola */
-    color: inherit; /* le decimos "usá mi verde, amiguito" */
-    font-family: inherit; 
-    font-size: 1.2rem; /* letra un poco más grandota */
-    outline: none; /* el recuadro celeste que te sale al hacer clic, te la debo, fuera */
-    padding: 5px; 
-    transition: 0.3s; /* que haga animaciones suaves */
-}
-
-/* Cuando hacés click para escribir, se prende más y queda fachero */
-#consola-input input:focus {
-    border-bottom: 2px solid var(--color-terminal); 
-    box-shadow: 0px 5px 10px -5px var(--sombra-activa); 
-}
-
-/* El botón de Iniciar Escaneo, le dimos cariño */
-#consola-input button {
-    background-color: var(--color-terminal); /* verde fondo */
-    color: #000; /* negras las letritas */
-    border: none; 
-    font-weight: bold; 
-    cursor: pointer; /* manito de "tocame" al pasar arriba */
-    transition: 0.2s; 
-    padding: 10px 20px; /* para que quede un buen botonzote */
-    border-radius: 2px; /* apenitas redondeado, onda serio */
-}
-
-/* Cuando le pasás el mouse al botón le agarra locura */
-#consola-input button:hover {
-    background-color: var(--color-alerta); /* se pasa a amarillo de alerta */
-    box-shadow: 0 0 15px var(--color-alerta); 
-    transform: scale(1.02); /* como que te salta un milímetro a la cara */
-}
-
-/* El botoncito de Abortar por si se pudre, lo hacemos rojito */
-#btn-abortar {
-    background-color: #1a0000; 
-    color: #ff3b3b; 
-    border: 1px solid #ff3b3b; 
-    display: none; /* lo dejamos escondido, solo sale si hace falta */
-}
-
-#btn-abortar:hover {
-    background-color: #ff3b3b; 
-    color: #000; 
-    box-shadow: 0 0 15px #ff3b3b; 
-}
-
-/* Ese cuadrito del menú lateral para cambiar los colores */
-.color-picker-marco {
-    display: inline-block; 
-    width: 40px; 
-    height: 40px;
-    border: var(--borde-panel); 
-    border-radius: 4px; 
-    overflow: hidden; /* si se escapa algo, lo tapamos */
-    cursor: pointer;
-    transition: 0.3s; 
-    flex-shrink: 0; /* "no te achiques nunca", le mandamos */
-}
-
-/* Brillito al color picker */
-.color-picker-marco:hover {
-    box-shadow: var(--sombra-activa);
-}
-
-#color-picker-menu {
-    -webkit-appearance: none; 
-    appearance: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    width: 60px; /* hicimos esto grandote a propósito para esconderle la ropa fea al input nativo */
-    height: 60px;
-    margin: -10px; /* lo tironeamos al medio */
-    background-color: transparent; 
-}
-
-/* La parte esa donde avisa por dónde va el escaneo */
-.panel-progreso {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 10px 15px;
-    border: 1px dashed var(--color-terminal);
     background-color: var(--fondo-absoluto);
-    
-    flex-basis: 100%; /* patea todo y hace que ocupe todo el piso de abajo entero */
-    margin-top: 10px;
-}
-
-.barra-tactica {
-    flex-grow: 1; /* comete lo que sobre en el medio */
-    height: 22px;
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-/* Esto es lo que va por detrás cuando la barra está vacía */
-.barra-tactica::-webkit-progress-bar {
-    background-color: transparent;
-    border: 1px solid var(--color-terminal);
-}
-
-/* Acá le armamos rayitas copadas para la parte que se va llenando */
-.barra-tactica::-webkit-progress-value {
-    background-color: var(--color-terminal);
-    background-image: repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(0, 0, 0, 0.6) 8px,
-        rgba(0, 0, 0, 0.6) 16px
-    );
-}
-
-/* Firefox siempre quiere ser diferente, le ponemos las rayitas ahí tmb */
-.barra-tactica::-moz-progress-bar {
-    background-color: var(--color-terminal);
-    background-image: repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(0, 0, 0, 0.6) 8px,
-        rgba(0, 0, 0, 0.6) 16px
-    );
-}
-
-.progreso-porcentaje {
     color: var(--color-terminal);
-    font-weight: bold;
-    font-size: 1.1rem;
+    font-family: var(--fuente-panel);
+    height: 100vh; overflow: hidden;
+    display: flex; justify-content: center; align-items: center;
 }
 
-/* Acá organizamos las cuatro ventanitas juntas, hicimos un tablero para que se queden en su lugar 2x2 */
+.bunker-container {
+    width: 95%; max-width: 1200px; height: 90vh;
+    display: flex; flex-direction: column; gap: 20px; padding: 20px 0;
+}
+
+#consola-input {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 15px;
+    padding: 20px; border: var(--borde-panel);
+    box-shadow: var(--sombra-neon); background-color: #0a0a0a;
+}
+
+#consola-input label { font-weight: bold; }
+#consola-input input {
+    flex-grow: 1; background: transparent; border: none;
+    border-bottom: 1px solid var(--color-terminal); color: inherit;
+    font-family: inherit; font-size: 1.2rem; outline: none; padding: 5px; transition: 0.3s;
+}
+#consola-input input:focus { border-bottom-width: 2px; box-shadow: 0px 5px 10px -5px var(--sombra-activa); }
+
+#consola-input button {
+    background-color: var(--color-terminal); color: #000; border: none;
+    font-weight: bold; cursor: pointer; transition: 0.2s; padding: 10px 20px; border-radius: 2px;
+}
+#consola-input button:hover { background-color: var(--color-alerta); box-shadow: 0 0 15px var(--color-alerta); transform: scale(1.02); }
+
+#btn-abortar { background-color: #1a0000; color: #ff3b3b; border: 1px solid #ff3b3b; display: none; }
+#btn-abortar:hover { background-color: #ff3b3b; color: #000; box-shadow: 0 0 15px #ff3b3b; }
+
+.panel-progreso { display: flex; align-items: center; gap: 15px; padding: 10px 15px; border: 1px dashed var(--color-terminal); background-color: var(--fondo-absoluto); flex-basis: 100%; margin-top: 10px; }
+.barra-tactica { flex-grow: 1; height: 22px; appearance: none; }
+.barra-tactica::-webkit-progress-bar { background-color: transparent; border: 1px solid var(--color-terminal); }
+.barra-tactica::-webkit-progress-value, .barra-tactica::-moz-progress-bar {
+    background-color: var(--color-terminal);
+    background-image: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,0,0,0.6) 8px, rgba(0,0,0,0.6) 16px);
+}
+.progreso-porcentaje { font-weight: bold; font-size: 1.1rem; }
+
 .paneles-grid {
-    display: grid; /* usamos Grid para jugar a la batalla naval 2x2 */
-    grid-template-columns: 1fr 1fr; /* dos columnas iguales */
-    grid-template-rows: 1fr 1fr; /* dos filas iguales */
-    gap: 15px; /* separaditos un cacho */
-    flex-grow: 1; /* que use todo el largo que le dimos a la caja madre */
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 15px; flex-grow: 1; min-height: 0;
 }
 
-/* Así se ve cada uno de nuestros 4 paneles geniales */
 .panel-bunker {
-    background-color: var(--fondo-absoluto); 
-    border: var(--borde-panel); 
-    box-shadow: var(--sombra-neon); 
-    display: flex; /* activamos modo flexible adentro para que el título se lleve con el contenido */
-    flex-direction: column; /* uno arriba y otro abajo */
-    cursor: pointer; 
-    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease; /* suavecito al moverse y brillar */
-    
-    /* Esta es clave: si el contenido de la caja se vuelve loco de grande, le frenamos el carro para que ande el scroll */
-    min-height: 0;
+    background-color: var(--fondo-absoluto); border: var(--borde-panel); box-shadow: var(--sombra-neon);
+    display: flex; flex-direction: column; cursor: pointer; min-height: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 }
+.panel-bunker:hover { transform: scale(1.03); box-shadow: var(--sombra-activa); z-index: 2; }
 
-/* Cuando le pasás con el mouse arriba al panel, parece que te habla */
-.panel-bunker:hover {
-    transform: scale(1.03); /* crece un 3% re loco */
-    box-shadow: var(--sombra-activa); 
-    z-index: 2; /* y se pone adelante de todos para no taparse */
-}
-
-/* La cabecera del panel donde dice qué es */
 .panel-titulo {
-    border-bottom: 1px dashed var(--color-terminal); /* rayita a puntitos que queda pro */
-    padding: 10px; 
-    margin-bottom: 5px; 
-    background-color: rgba(0, 255, 65, 0.05); /* rellenito verde mega transparente */
+    border-bottom: 1px dashed var(--color-terminal); padding: 10px; margin-bottom: 5px;
+    background-color: rgba(0, 255, 65, 0.05); display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.icono-panel { width: 20px; height: 20px; flex-shrink: 0; filter: drop-shadow(0 0 3px rgba(var(--color-terminal-rgb), 0.6)); }
+.contenido-panel { padding: 15px; line-height: 1.6; font-size: var(--tamano-fuente-panel); transition: 0.2s ease; }
 
-    /* Lo juntamos re bien con el dibujito al lado usando flex */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0; /* pase lo que pase no lo dejamos que se encoja */
-}
+.scroll-activo { overflow-y: auto; overflow-x: hidden; min-height: 0; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--color-terminal) #111; }
+.scroll-activo::-webkit-scrollbar { width: 6px; }
+.scroll-activo::-webkit-scrollbar-track { background: #111; border-radius: 10px; }
+.scroll-activo::-webkit-scrollbar-thumb { background-color: var(--color-terminal); border-radius: 10px; transition: 0.2s; }
+.scroll-activo::-webkit-scrollbar-thumb:hover { box-shadow: 0 0 6px var(--color-terminal); }
 
-/* El dibujito vectorial táctico. Como le pusimos currentcolor, toma el verde por magia sin tener que hacer nada */
-.icono-panel {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0; /* vos te quedás así de este tamaño, eh */
-    filter: drop-shadow(0 0 3px rgba(var(--color-terminal-rgb), 0.6)); /* prendemos la linterna atrás del icono */
-}
+.vista-header, .enlaces-resumen { padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px dashed rgba(var(--color-terminal-rgb), 0.4); font-size: 0.9em; }
+.enlaces-resumen { display: flex; flex-wrap: wrap; gap: 15px; }
 
-/* El textito con la info que entra al panel */
-.contenido-panel {
-    padding: 15px; 
-    line-height: 1.6; /* letras más separadas así no te matan la vista */
-    font-size: var(--tamano-fuente-panel); /* agarramos la variable por si el usuario cambia el tamaño */
-    font-family: var(--fuente-panel); /* lo mismo pero con el tipo de letra */
-    transition: font-size 0.2s ease, font-family 0.2s ease; /* y obvio que cambie de a poquito para no asustar */
-}
+.galeria-capturas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.captura-item { position: relative; border: 1px solid rgba(var(--color-terminal-rgb), 0.5); overflow: hidden; aspect-ratio: 16/10; transition: 0.2s; }
+.captura-item img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top; filter: grayscale(15%) contrast(1.05); transition: 0.3s; }
+.captura-item:hover { border-color: var(--color-terminal); box-shadow: var(--sombra-activa); z-index: 1; }
+.captura-item:hover img { filter: none; transform: scale(1.04); }
+.captura-numero { position: absolute; top: 4px; left: 4px; background: rgba(5,5,5,0.85); font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border: 1px solid var(--color-terminal); border-radius: 2px; }
 
-/* La barrita de scroll para cuando tenemos un choclo larguísimo de datos */
-.scroll-activo {
-    overflow-y: auto; /* le decimos: si el texto explota, poné un fierrito pa' bajar */
-    overflow-x: hidden; /* y a los costados nada, escondelo que molesta */
-    min-height: 0; /* confirmamos que no nos empuje el techo */
-    flex-grow: 1; /* dale para abajo con todo el alto que te sobra */
+.lista-enlaces { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.item-enlace a { display: block; color: var(--color-terminal); text-decoration: none; padding: 4px 6px; border-left: 2px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.15s; }
+.item-enlace a::before { content: '> '; opacity: 0.6; }
+.item-enlace a:hover { background-color: rgba(var(--color-terminal-rgb), 0.1); border-left-color: var(--color-terminal); text-decoration: underline; }
+.nota-truncado { margin-top: 8px; padding: 6px; color: var(--color-alerta); font-size: 0.8em; font-style: italic; }
 
-    /* Esto para los de Firefox porque son los raros del barrio */
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-terminal) #111;
-}
-
-/* Al de Chrome y Edge le pasamos esta brocha verde para que la barrita quede facha */
-.scroll-activo::-webkit-scrollbar {
-    width: 6px; /* delgada pero se ve */
-}
-.scroll-activo::-webkit-scrollbar-track {
-    background: #111; /* le hicimos un caminito gris oscuro */
-    border-radius: 10px;
-}
-.scroll-activo::-webkit-scrollbar-thumb {
-    background-color: var(--color-terminal); /* la gomita que movés en verde */
-    border-radius: 10px; 
-    transition: 0.2s;
-}
-/* Le enchufamos luz a la barrita cuando le pasás por encima */
-.scroll-activo::-webkit-scrollbar-thumb:hover {
-    box-shadow: 0 0 6px var(--color-terminal);
-}
-
-/* Acá arreglamos para que en un celular no se vea todo hecho un desastre apretado */
 @media (max-width: 768px) {
-    .paneles-grid {
-        grid-template-columns: 1fr; /* rompemos todo y lo ponemos en una sola filita larga */
-        grid-template-rows: auto; /* dejá que cada cajita decida cuánto mide */
-    }
-    
-    .panel-bunker {
-        min-height: 250px; /* para que no te quede una tirita ridícula en el celu */
-    }
-
-    /* si estás en Discord mode en el celu, metemos todo un toque más apretado */
-    .paneles-grid.modo-foco {
-        grid-template-rows: 1fr 90px; 
-    }
-
-    .paneles-grid.modo-foco .panel-minimizado .panel-titulo {
-        font-size: 0.65rem; /* achicamos para que quepa bien el título */
-    }
+    body { height: auto; min-height: 100vh; overflow-y: auto; align-items: flex-start; }
+    .bunker-container { height: auto; min-height: auto; }
+    .paneles-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .panel-bunker { height: 380px; }
+    .paneles-grid.modo-foco { grid-template-rows: auto; }
+    .paneles-grid.modo-foco .panel-expandido { height: 500px; }
+    .paneles-grid.modo-foco .panel-minimizado { height: 60px; }
+    .paneles-grid.modo-foco .panel-minimizado .panel-titulo { font-size: 0.65rem; }
 }
 
-/* Escondemos a matrix atrás de todo para que no nos moleste para leer */
-#matrix-rain {
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* bien al fondo de todos */
-    opacity: 0.35; /* lo oscurecimos un toque que mareaba sino */
-}
+#matrix-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.35; }
 
-/* El ruidito visual de esperando... esperando.. para sumar ansiedad hacker */
-.esperando::after {
-    content: '';
-    animation: tipeo-espera 4s steps(1) infinite;
-}
-
+.esperando::after { content: ''; animation: tipeo-espera 4s steps(1) infinite; }
 @keyframes tipeo-espera {
-    /* simulamos que un loco lo escribe lento letra por letra */
-    0%   { content: 'E'; }
-    4%   { content: 'Es'; }
-    8%   { content: 'Esp'; }
-    12%  { content: 'Espe'; }
-    16%  { content: 'Esper'; }
-    20%  { content: 'Espera'; }
-    24%  { content: 'Esperan'; }
-    28%  { content: 'Esperand'; }
-    32%  { content: 'Esperando'; }
-    36%  { content: 'Esperando '; }
-    40%  { content: 'Esperando o'; }
-    44%  { content: 'Esperando ob'; }
-    48%  { content: 'Esperando obj'; }
-    52%  { content: 'Esperando obje'; }
-    56%  { content: 'Esperando objet'; }
-    60%  { content: 'Esperando objeti'; }
-    64%  { content: 'Esperando objetiv'; }
-    68%  { content: 'Esperando objetivo'; }
-
-    /* Los puntitos se animan también, como de suspenso */
-    72%  { content: 'Esperando objetivo'; }
-    78%  { content: 'Esperando objetivo.'; }
-    84%  { content: 'Esperando objetivo..'; }
-    90%  { content: 'Esperando objetivo...'; }
-
-    /* Y ahí un descanso de medio segundo antes de reiniciar el ciclo */
-    96%  { content: 'Esperando objetivo...'; }
-    100% { content: ''; }
+    0%{content:'E'} 10%{content:'Esp'} 20%{content:'Espera'} 30%{content:'Esperando'}
+    50%{content:'Esperando obj'} 70%{content:'Esperando objetivo'} 90%{content:'Esperando objetivo...'} 100%{content:''}
 }
 
-/* El chiche del Discord. Esto salta cuando el pibe hace click en una caja */
-.paneles-grid.modo-foco {
-    display: grid;
-    grid-template-rows: 1fr 130px; /* al capo de la caja grande le damos todo arriba, y a los 3 pichis de abajo una tirita fija */
-    grid-template-columns: repeat(3, minmax(0, 1fr)); /* los de abajo se dividen en 3 pedacitos iguales sin quejarse */
-    gap: 15px;
-}
+.paneles-grid.modo-foco { display: grid; grid-template-rows: minmax(0, 1fr) 130px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
+.paneles-grid.modo-foco .panel-expandido { grid-row: 1; grid-column: 1 / -1; }
+.paneles-grid.modo-foco .panel-minimizado { grid-row: 2; min-width: 0; opacity: 0.75; overflow: hidden; }
+.paneles-grid.modo-foco .panel-minimizado .panel-titulo { font-size: 0.75rem; padding: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.paneles-grid.modo-foco .panel-minimizado .contenido-panel { display: none; }
+.paneles-grid.modo-foco .panel-minimizado:hover { opacity: 1; transform: scale(1.05); box-shadow: var(--sombra-activa); z-index: 5; }
 
-/* El panel gigante, estiralo por toda la fila superior de lado a lado */
-.paneles-grid.modo-foco .panel-expandido {
-    grid-row: 1;
-    grid-column: 1 / -1; 
-}
-
-/* A los chiquitos los mandamos al calabozo de la fila de abajo y los apagamos un poco */
-.paneles-grid.modo-foco .panel-minimizado {
-    grid-row: 2;
-    min-width: 0; /* por si querían mandarse parte y estirar, na-na */
-    opacity: 0.75; 
-    overflow: hidden; /* y si te sobra texto, cortámelo */
-}
-
-/* Reducimos el tamaño de todo adentro del chiquitito para que no se vea fiero */
-.paneles-grid.modo-foco .panel-minimizado .panel-titulo {
-    font-size: 0.75rem;
-    padding: 8px;
-    white-space: nowrap;
-    text-overflow: ellipsis; /* le metemos "..." por si no entra */
-    overflow: hidden;
-}
-
-/* No vale la pena mostrar el contenido si es chiquito, escondan esa cochinada */
-.paneles-grid.modo-foco .panel-minimizado .contenido-panel {
-    display: none;
-}
-
-/* Pero si pasás el ratón por el chiquito, que brille pa saber que podés volver ahí */
-.paneles-grid.modo-foco .panel-minimizado:hover {
-    opacity: 1;
-    transform: scale(1.05); 
-    box-shadow: var(--sombra-activa);
-    z-index: 5; /* arríba de todo por las dudas */
-}
-
-/* Este es el menú cheto que sale de la derecha */
 #menu-lateral {
-    position: fixed;
-    top: 0;
-    right: -400px; /* al principio lo rajamos afuera de la pantalla pa' que no estorbe */
-    width: 320px;
-    height: 100vh;
-    background-color: rgba(5, 5, 5, 0.95); /* oscurito pero se ve apenas el fondo */
-    border-left: var(--borde-panel);
-    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.9);
-    z-index: 100; /* te tapo todo, papá */
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    transition: right 0.4s ease-in-out; /* el efectito suave que entra de costado */
+    position: fixed; top: 0; right: -400px; width: 320px; height: 100vh;
+    background-color: rgba(5,5,5,0.95); border-left: var(--borde-panel); box-shadow: -5px 0 20px rgba(0,0,0,0.9);
+    z-index: 100; padding: 20px; display: flex; flex-direction: column; gap: 25px; transition: right 0.4s ease-in-out;
 }
+#menu-lateral.abierto { right: 26px; }
 
-/* Cuando apretamos por código que lo abran, le clavamos esta clase así entra como piña */
-#menu-lateral.abierto {
-    right: 26px; /* lo dejamos un poquitito despegado así queda más lindo y la crucecita respira */
-}
+.menu-header { display: flex; justify-content: space-between; align-items: center; }
+#btn-cerrar-menu { background: transparent; color: var(--color-alerta); border: 1px solid var(--color-alerta); padding: 5px 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+#btn-cerrar-menu:hover { background: var(--color-alerta); color: #000; }
 
-.menu-header {
-    display: flex;
-    justify-content: space-between; /* cada cual a su esquina */
-    align-items: center;
-}
+.selector-fuente { display: flex; gap: 8px; }
+.btn-fuente, .btn-tipografia { flex: 1; background: transparent; color: var(--color-terminal); border: var(--borde-panel); padding: 8px 0; cursor: pointer; font-weight: bold; border-radius: 2px; transition: 0.2s; }
+.btn-tipografia { padding: 8px 4px; font-size: 0.8rem; }
+.btn-fuente:hover, .btn-tipografia:hover { background-color: rgba(var(--color-terminal-rgb), 0.15); }
+.btn-fuente.activo, .btn-tipografia.activo { background-color: var(--color-terminal); color: #000; box-shadow: var(--sombra-neon); }
+.menu-seccion h3 { font-size: 1rem; margin-bottom: 15px; border-bottom: 1px dashed var(--color-terminal); padding-bottom: 5px; }
 
-#btn-cerrar-menu {
-    background: transparent;
-    color: var(--color-alerta);
-    border: 1px solid var(--color-alerta);
-    padding: 5px 10px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
-}
+#lista-historial { display: flex; flex-direction: column; gap: 10px; list-style: none; }
+.item-historial { border: var(--borde-panel); padding: 10px; font-size: 0.85rem; cursor: pointer; background-color: rgba(0,255,65,0.05); word-break: break-all; transition: 0.2s; }
+.item-historial:hover { background-color: var(--color-terminal); color: #000; box-shadow: var(--sombra-neon); }
 
-#btn-cerrar-menu:hover {
-    background: var(--color-alerta);
-    color: #000;
-}
-
-/* Los 4 botoncitos locos para elegir el tamaño de letra */
-.selector-fuente {
-    display: flex; 
-    gap: 8px; 
-}
-
-.btn-fuente,
-.btn-tipografia {
-    flex: 1; /* compartan todos igual de ancho como hermanos */
-    background: transparent;
-    color: var(--color-terminal);
-    border: 1px solid var(--color-terminal);
-    padding: 8px 0;
-    cursor: pointer;
-    font-family: inherit; 
-    font-weight: bold;
-    border-radius: 2px;
-    transition: 0.2s;
-}
-
-/* Estos necesitan un poco menos de colchón porque el nombre es medio largo */
-.btn-tipografia {
-    padding: 8px 4px;
-    font-size: 0.8rem;
-}
-
-.btn-fuente:hover,
-.btn-tipografia:hover {
-    background-color: rgba(var(--color-terminal-rgb), 0.15); /* los bañamos un poquito con el verde al pasar el mouse */
-}
-
-/* El botón activo (el que marcaste recién) lo dejamos bien facherito así sabés qué tenés puesto */
-.btn-fuente.activo,
-.btn-tipografia.activo {
-    background-color: var(--color-terminal);
-    color: #000;
-    box-shadow: var(--sombra-neon);
-}
-
-.menu-seccion h3 {
-    font-size: 1rem;
-    margin-bottom: 15px;
-    border-bottom: 1px dashed var(--color-terminal);
-    padding-bottom: 5px;
-}
-
-#lista-historial {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* Cada ítem viejo que buscaste y te quedó guardado */
-.item-historial {
-    border: var(--borde-panel);
-    padding: 10px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    background-color: rgba(0, 255, 65, 0.05);
-    word-break: break-all; /* si la url es re mega larga, partila sin asco hermano, que me desarmás el panel */
-    transition: 0.2s;
-}
-
-.item-historial:hover {
-    background-color: var(--color-terminal);
-    color: #000;
-    box-shadow: var(--sombra-neon);
-}
+.color-picker-marco { display: inline-block; width: 40px; height: 40px; border: var(--borde-panel); border-radius: 4px; overflow: hidden; cursor: pointer; transition: 0.3s; flex-shrink: 0; }
+.color-picker-marco:hover { box-shadow: var(--sombra-activa); }
+#color-picker-menu { appearance: none; border: none; padding: 0; cursor: pointer; width: 60px; height: 60px; margin: -10px; background: transparent; }

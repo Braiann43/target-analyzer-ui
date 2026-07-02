@@ -2,7 +2,7 @@
 // TARGET ANALYZER - BACKEND
 // Implementa exactamente el contrato que espera script.js:
 //   POST /api/escanear   body: { url: "https://..." }
-//   200 -> { mensaje, objetivo, identidad, tecnologias, metricas }
+//   200 -> { mensaje, objetivo, identidad, vista, tecnologias, enlaces, metricas }
 //   4xx/5xx -> { error: "..." }
 //
 // A partir de ahora este servidor NO escanea nada por su cuenta: le delega
@@ -27,7 +27,7 @@ app.use(express.json());  // Para poder leer el JSON que manda el fetch del fron
 // tal cual a robot.js, que lo usa como techo de navegación de Puppeteer: así el
 // timeout se dispara DENTRO de Chrome (que se cierra solo y prolijo), en vez de
 // que nosotros cortemos la espera desde afuera y dejemos el Chrome huérfano.
-const TIMEOUT_MS = 30000;
+const TIMEOUT_MS = 20000;
 
 // --------------------------------------------------------------------------
 // ENDPOINT PRINCIPAL
@@ -58,11 +58,16 @@ app.post('/api/escanear', async (req, res) => {
 
         // 3) Armamos la respuesta EXACTA que espera script.js, envolviendo lo
         // que devolvió el Robot con el mensaje de éxito y el hostname del objetivo.
+        // A partir de ahora también viajan "vista" (las capturas de pantalla en
+        // base64) y "enlaces" (el mapeo de todos los <a href> encontrados), que
+        // antes no existían en el contrato.
         return res.status(200).json({
             mensaje: '[OBJETIVO LOCALIZADO Y ANALIZADO CON ÉXITO]',
             objetivo: urlObjetivo.hostname,
             identidad: datosExtraidos.identidad,
+            vista: datosExtraidos.vista,
             tecnologias: datosExtraidos.tecnologias,
+            enlaces: datosExtraidos.enlaces,
             metricas: {
                 ...datosExtraidos.metricas,
                 // robot.js entrega el peso como string (toFixed), lo normalizamos a
