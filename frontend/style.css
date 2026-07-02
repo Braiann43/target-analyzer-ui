@@ -1,7 +1,13 @@
+/* ==========================================================================
+   VARIABLES GLOBALES
+   Acá definimos todos los colores y medidas como variables CSS, así si
+   queremos cambiar el color principal de todo el sitio, lo cambiamos en
+   un solo lugar y se actualiza en todos lados donde se usa
+   ========================================================================== */
 :root {
     --fondo-absoluto: #050505;
     --color-terminal: #00ff41;
-    --color-terminal-rgb: 0, 255, 65;
+    --color-terminal-rgb: 0, 255, 65; /* mismo color de arriba pero en formato r,g,b, para poder usarlo con rgba() en las sombras */
     --color-alerta: #f2ff00;
     --borde-panel: 1px solid var(--color-terminal);
     --sombra-neon: 0 0 10px rgba(var(--color-terminal-rgb), 0.2);
@@ -10,142 +16,619 @@
     --fuente-panel: 'Courier New', Courier, monospace;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* Reseteo básico: sacamos los márgenes y paddings por defecto del navegador
+   y ponemos box-sizing border-box para que los paddings no rompan los anchos */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
+/* El body ocupa toda la pantalla y centra el contenedor principal, tanto
+   vertical como horizontalmente. El overflow hidden es para que no aparezca
+   scroll del navegador, ya que cada panel maneja su propio scroll interno */
 body {
     background-color: var(--fondo-absoluto);
     color: var(--color-terminal);
     font-family: var(--fuente-panel);
-    height: 100vh; overflow: hidden;
-    display: flex; justify-content: center; align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+/* Contenedor principal de toda la app: ocupa casi toda la pantalla y
+   organiza sus hijos (input, grilla de paneles) en columna */
 .bunker-container {
-    width: 95%; max-width: 1200px; height: 90vh;
-    display: flex; flex-direction: column; gap: 20px; padding: 20px 0;
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px 0;
 }
 
+
+/* ==========================================================================
+   BARRA DE BÚSQUEDA (input + botones de escanear/abortar)
+   ========================================================================== */
 #consola-input {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 15px;
-    padding: 20px; border: var(--borde-panel);
-    box-shadow: var(--sombra-neon); background-color: #0a0a0a;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border: var(--borde-panel);
+    box-shadow: var(--sombra-neon);
+    background-color: #0a0a0a;
 }
 
-#consola-input label { font-weight: bold; }
-#consola-input input {
-    flex-grow: 1; background: transparent; border: none;
-    border-bottom: 1px solid var(--color-terminal); color: inherit;
-    font-family: inherit; font-size: 1.2rem; outline: none; padding: 5px; transition: 0.3s;
+#consola-input label {
+    font-weight: bold;
 }
-#consola-input input:focus { border-bottom-width: 2px; box-shadow: 0px 5px 10px -5px var(--sombra-activa); }
+
+/* El input crece para ocupar todo el espacio libre disponible en la fila */
+#consola-input input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-terminal);
+    color: inherit;
+    font-family: inherit;
+    font-size: 1.2rem;
+    outline: none;
+    padding: 5px;
+    transition: 0.3s;
+}
+
+/* Cuando el usuario está escribiendo, engrosamos el borde de abajo y le
+   agregamos un resplandor para que se note que el input está activo */
+#consola-input input:focus {
+    border-bottom-width: 2px;
+    box-shadow: 0px 5px 10px -5px var(--sombra-activa);
+}
 
 #consola-input button {
-    background-color: var(--color-terminal); color: #000; border: none;
-    font-weight: bold; cursor: pointer; transition: 0.2s; padding: 10px 20px; border-radius: 2px;
-}
-#consola-input button:hover { background-color: var(--color-alerta); box-shadow: 0 0 15px var(--color-alerta); transform: scale(1.02); }
-
-#btn-abortar { background-color: #1a0000; color: #ff3b3b; border: 1px solid #ff3b3b; display: none; }
-#btn-abortar:hover { background-color: #ff3b3b; color: #000; box-shadow: 0 0 15px #ff3b3b; }
-
-.panel-progreso { display: flex; align-items: center; gap: 15px; padding: 10px 15px; border: 1px dashed var(--color-terminal); background-color: var(--fondo-absoluto); flex-basis: 100%; margin-top: 10px; }
-.barra-tactica { flex-grow: 1; height: 22px; appearance: none; }
-.barra-tactica::-webkit-progress-bar { background-color: transparent; border: 1px solid var(--color-terminal); }
-.barra-tactica::-webkit-progress-value, .barra-tactica::-moz-progress-bar {
     background-color: var(--color-terminal);
-    background-image: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0,0,0,0.6) 8px, rgba(0,0,0,0.6) 16px);
+    color: #000;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 10px 20px;
+    border-radius: 2px;
 }
-.progreso-porcentaje { font-weight: bold; font-size: 1.1rem; }
 
+/* Al pasar el mouse, el botón cambia al color de alerta y se agranda un
+   poquito, para dar feedback de que es clickeable */
+#consola-input button:hover {
+    background-color: var(--color-alerta);
+    box-shadow: 0 0 15px var(--color-alerta);
+    transform: scale(1.02);
+}
+
+/* El botón de abortar arranca oculto (lo muestra el JS solo mientras hay
+   un escaneo en curso) y usa una paleta de colores rojiza para que se
+   distinga clarito del botón de escanear */
+#btn-abortar {
+    background-color: #1a0000;
+    color: #ff3b3b;
+    border: 1px solid #ff3b3b;
+    display: none;
+}
+
+#btn-abortar:hover {
+    background-color: #ff3b3b;
+    color: #000;
+    box-shadow: 0 0 15px #ff3b3b;
+}
+
+
+/* ==========================================================================
+   BARRA DE PROGRESO
+   ========================================================================== */
+.panel-progreso {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    border: 1px dashed var(--color-terminal);
+    background-color: var(--fondo-absoluto);
+    flex-basis: 100%; /* fuerza que ocupe todo el ancho de la fila, abajo del input */
+    margin-top: 10px;
+}
+
+.barra-tactica {
+    flex-grow: 1;
+    height: 22px;
+    appearance: none; /* sacamos el estilo nativo del navegador para poder pintarla nosotros */
+}
+
+.barra-tactica::-webkit-progress-bar {
+    background-color: transparent;
+    border: 1px solid var(--color-terminal);
+}
+
+/* Este es el "relleno" de la barra: le metemos un patrón de rayas
+   diagonales para que tenga esa onda militar/táctica en vez de ser un
+   bloque de color liso y aburrido */
+.barra-tactica::-webkit-progress-value,
+.barra-tactica::-moz-progress-bar {
+    background-color: var(--color-terminal);
+    background-image: repeating-linear-gradient(-45deg, transparent, transparent 8px, rgba(0, 0, 0, 0.6) 8px, rgba(0, 0, 0, 0.6) 16px);
+}
+
+.progreso-porcentaje {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+
+/* ==========================================================================
+   GRILLA DE PANELES (los 4 cuadrantes: vista, tech, enlaces, métricas)
+   ========================================================================== */
 .paneles-grid {
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 15px; flex-grow: 1; min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 15px;
+    flex-grow: 1;
+    min-height: 0; /* esto evita que la grilla se desborde del contenedor padre en flexbox */
 }
 
 .panel-bunker {
-    background-color: var(--fondo-absoluto); border: var(--borde-panel); box-shadow: var(--sombra-neon);
-    display: flex; flex-direction: column; cursor: pointer; min-height: 0;
+    background-color: var(--fondo-absoluto);
+    border: var(--borde-panel);
+    box-shadow: var(--sombra-neon);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer; /* clickeable para entrar en modo foco (ver script.js) */
+    min-height: 0;
     transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
 }
-.panel-bunker:hover { transform: scale(1.03); box-shadow: var(--sombra-activa); z-index: 2; }
+
+.panel-bunker:hover {
+    transform: scale(1.03);
+    box-shadow: var(--sombra-activa);
+    z-index: 2; /* para que el panel agrandado quede por encima de los vecinos y no se tape */
+}
 
 .panel-titulo {
-    border-bottom: 1px dashed var(--color-terminal); padding: 10px; margin-bottom: 5px;
-    background-color: rgba(0, 255, 65, 0.05); display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    border-bottom: 1px dashed var(--color-terminal);
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: rgba(0, 255, 65, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0; /* así el título nunca se achica, aunque el contenido del panel sea gigante */
 }
-.icono-panel { width: 20px; height: 20px; flex-shrink: 0; filter: drop-shadow(0 0 3px rgba(var(--color-terminal-rgb), 0.6)); }
-.contenido-panel { padding: 15px; line-height: 1.6; font-size: var(--tamano-fuente-panel); transition: 0.2s ease; }
 
-.scroll-activo { overflow-y: auto; overflow-x: hidden; min-height: 0; flex-grow: 1; scrollbar-width: thin; scrollbar-color: var(--color-terminal) #111; }
-.scroll-activo::-webkit-scrollbar { width: 6px; }
-.scroll-activo::-webkit-scrollbar-track { background: #111; border-radius: 10px; }
-.scroll-activo::-webkit-scrollbar-thumb { background-color: var(--color-terminal); border-radius: 10px; transition: 0.2s; }
-.scroll-activo::-webkit-scrollbar-thumb:hover { box-shadow: 0 0 6px var(--color-terminal); }
+.icono-panel {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 3px rgba(var(--color-terminal-rgb), 0.6));
+}
 
-.vista-header, .enlaces-resumen { padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px dashed rgba(var(--color-terminal-rgb), 0.4); font-size: 0.9em; }
-.enlaces-resumen { display: flex; flex-wrap: wrap; gap: 15px; }
+.contenido-panel {
+    padding: 15px;
+    line-height: 1.6;
+    font-size: var(--tamano-fuente-panel); /* esto lo maneja el menú de configuración, para achicar o agrandar la letra */
+    transition: 0.2s ease;
+}
 
-.galeria-capturas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.captura-item { position: relative; border: 1px solid rgba(var(--color-terminal-rgb), 0.5); overflow: hidden; aspect-ratio: 16/10; transition: 0.2s; }
-.captura-item img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top; filter: grayscale(15%) contrast(1.05); transition: 0.3s; }
-.captura-item:hover { border-color: var(--color-terminal); box-shadow: var(--sombra-activa); z-index: 1; }
-.captura-item:hover img { filter: none; transform: scale(1.04); }
-.captura-numero { position: absolute; top: 4px; left: 4px; background: rgba(5,5,5,0.85); font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border: 1px solid var(--color-terminal); border-radius: 2px; }
+/* Esta clase le da scroll propio al panel: así el contenido largo (por
+   ejemplo la lista de enlaces) no sobresale de la pantalla, sino que
+   scrollea adentro de su propio cuadrante */
+.scroll-activo {
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    flex-grow: 1;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-terminal) #111;
+}
 
-.lista-enlaces { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-.item-enlace a { display: block; color: var(--color-terminal); text-decoration: none; padding: 4px 6px; border-left: 2px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: 0.15s; }
-.item-enlace a::before { content: '> '; opacity: 0.6; }
-.item-enlace a:hover { background-color: rgba(var(--color-terminal-rgb), 0.1); border-left-color: var(--color-terminal); text-decoration: underline; }
-.nota-truncado { margin-top: 8px; padding: 6px; color: var(--color-alerta); font-size: 0.8em; font-style: italic; }
+/* Estilamos la barra de scroll a mano para que combine con el resto de la
+   estética terminal/hacker (los navegadores basados en Chrome usan esto) */
+.scroll-activo::-webkit-scrollbar {
+    width: 6px;
+}
 
+.scroll-activo::-webkit-scrollbar-track {
+    background: #111;
+    border-radius: 10px;
+}
+
+.scroll-activo::-webkit-scrollbar-thumb {
+    background-color: var(--color-terminal);
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.scroll-activo::-webkit-scrollbar-thumb:hover {
+    box-shadow: 0 0 6px var(--color-terminal);
+}
+
+.vista-header,
+.enlaces-resumen {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed rgba(var(--color-terminal-rgb), 0.4);
+    font-size: 0.9em;
+}
+
+.enlaces-resumen {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+
+/* ==========================================================================
+   GALERÍA DE CAPTURAS (panel "vista")
+   ========================================================================== */
+.galeria-capturas {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.captura-item {
+    position: relative;
+    border: 1px solid rgba(var(--color-terminal-rgb), 0.5);
+    overflow: hidden;
+    aspect-ratio: 16 / 10; /* fuerza que todas las miniaturas tengan el mismo alto/ancho, aunque la captura original sea más larga */
+    transition: 0.2s;
+}
+
+.captura-item img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover; /* recorta la imagen para que llene el recuadro sin deformarse */
+    object-position: top; /* priorizamos mostrar la parte de arriba de la captura, que suele ser la más importante */
+    filter: grayscale(15%) contrast(1.05);
+    transition: 0.3s;
+}
+
+.captura-item:hover {
+    border-color: var(--color-terminal);
+    box-shadow: var(--sombra-activa);
+    z-index: 1;
+}
+
+.captura-item:hover img {
+    filter: none;
+    transform: scale(1.04); /* zoom leve al pasar el mouse, como para invitar al click */
+}
+
+.captura-numero {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: rgba(5, 5, 5, 0.85);
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 6px;
+    border: 1px solid var(--color-terminal);
+    border-radius: 2px;
+}
+
+
+/* ==========================================================================
+   LISTA DE ENLACES (panel "enlaces")
+   ========================================================================== */
+.lista-enlaces {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-enlace a {
+    display: block;
+    color: var(--color-terminal);
+    text-decoration: none;
+    padding: 4px 6px;
+    border-left: 2px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* si el link es muy largo, lo corta con puntos suspensivos para que no rompa el diseño */
+    transition: 0.15s;
+}
+
+.item-enlace a::before {
+    content: '> '; /* le agregamos el "> " adelante para que quede con onda de terminal/consola */
+    opacity: 0.6;
+}
+
+.item-enlace a:hover {
+    background-color: rgba(var(--color-terminal-rgb), 0.1);
+    border-left-color: var(--color-terminal);
+    text-decoration: underline;
+}
+
+.nota-truncado {
+    margin-top: 8px;
+    padding: 6px;
+    color: var(--color-alerta);
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE (pantallas chicas, celular)
+   ========================================================================== */
 @media (max-width: 768px) {
-    body { height: auto; min-height: 100vh; overflow-y: auto; align-items: flex-start; }
-    .bunker-container { height: auto; min-height: auto; }
-    .paneles-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
-    .panel-bunker { height: 380px; }
-    .paneles-grid.modo-foco { grid-template-rows: auto; }
-    .paneles-grid.modo-foco .panel-expandido { height: 500px; }
-    .paneles-grid.modo-foco .panel-minimizado { height: 60px; }
-    .paneles-grid.modo-foco .panel-minimizado .panel-titulo { font-size: 0.65rem; }
+    /* En celular dejamos que la página scrollee normal, ya que apilar los
+       4 paneles en columna necesita más alto del que entra en una pantalla */
+    body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        align-items: flex-start;
+    }
+
+    .bunker-container {
+        height: auto;
+        min-height: auto;
+    }
+
+    /* La grilla pasa de 2x2 a una sola columna, así los paneles se apilan
+       uno abajo del otro en vez de quedar apretados uno al lado del otro */
+    .paneles-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .panel-bunker {
+        height: 380px;
+    }
+
+    /* Ajustamos también el modo foco para que funcione bien apilado en
+       vertical dentro de celulares */
+    .paneles-grid.modo-foco {
+        grid-template-rows: auto;
+    }
+
+    .paneles-grid.modo-foco .panel-expandido {
+        height: 500px;
+    }
+
+    .paneles-grid.modo-foco .panel-minimizado {
+        height: 60px;
+    }
+
+    .paneles-grid.modo-foco .panel-minimizado .panel-titulo {
+        font-size: 0.65rem;
+    }
 }
 
-#matrix-rain { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.35; }
 
-.esperando::after { content: ''; animation: tipeo-espera 4s steps(1) infinite; }
+/* ==========================================================================
+   FONDO ANIMADO ESTILO "MATRIX"
+   ========================================================================== */
+#matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* lo mandamos bien atrás para que quede de fondo, detrás de toda la interfaz */
+    opacity: 0.35;
+}
+
+/* Efecto de "tipeo" para cuando un panel está vacío esperando un escaneo:
+   va mostrando la palabra "Esperando objetivo..." letra por letra en loop */
+.esperando::after {
+    content: '';
+    animation: tipeo-espera 4s steps(1) infinite;
+}
+
 @keyframes tipeo-espera {
-    0%{content:'E'} 10%{content:'Esp'} 20%{content:'Espera'} 30%{content:'Esperando'}
-    50%{content:'Esperando obj'} 70%{content:'Esperando objetivo'} 90%{content:'Esperando objetivo...'} 100%{content:''}
+    0% { content: 'E'; }
+    10% { content: 'Esp'; }
+    20% { content: 'Espera'; }
+    30% { content: 'Esperando'; }
+    50% { content: 'Esperando obj'; }
+    70% { content: 'Esperando objetivo'; }
+    90% { content: 'Esperando objetivo...'; }
+    100% { content: ''; }
 }
 
-.paneles-grid.modo-foco { display: grid; grid-template-rows: minmax(0, 1fr) 130px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
-.paneles-grid.modo-foco .panel-expandido { grid-row: 1; grid-column: 1 / -1; }
-.paneles-grid.modo-foco .panel-minimizado { grid-row: 2; min-width: 0; opacity: 0.75; overflow: hidden; }
-.paneles-grid.modo-foco .panel-minimizado .panel-titulo { font-size: 0.75rem; padding: 8px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-.paneles-grid.modo-foco .panel-minimizado .contenido-panel { display: none; }
-.paneles-grid.modo-foco .panel-minimizado:hover { opacity: 1; transform: scale(1.05); box-shadow: var(--sombra-activa); z-index: 5; }
 
+/* ==========================================================================
+   MODO FOCO
+   Se activa cuando el usuario clickea un panel: ese panel se agranda y
+   ocupa toda la fila de arriba, y los otros tres quedan achicados abajo
+   como una especie de "pestañas" en miniatura
+   ========================================================================== */
+.paneles-grid.modo-foco {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) 130px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.paneles-grid.modo-foco .panel-expandido {
+    grid-row: 1;
+    grid-column: 1 / -1; /* ocupa todas las columnas de la fila de arriba */
+}
+
+.paneles-grid.modo-foco .panel-minimizado {
+    grid-row: 2;
+    min-width: 0;
+    opacity: 0.75;
+    overflow: hidden;
+}
+
+.paneles-grid.modo-foco .panel-minimizado .panel-titulo {
+    font-size: 0.75rem;
+    padding: 8px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* Ocultamos el contenido de los paneles minimizados, ya que en ese tamaño
+   tan chiquito no se llega a leer nada igual, solo mostramos el título */
+.paneles-grid.modo-foco .panel-minimizado .contenido-panel {
+    display: none;
+}
+
+.paneles-grid.modo-foco .panel-minimizado:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: var(--sombra-activa);
+    z-index: 5;
+}
+
+
+/* ==========================================================================
+   MENÚ LATERAL (configuración + historial)
+   ========================================================================== */
 #menu-lateral {
-    position: fixed; top: 0; right: -400px; width: 320px; height: 100vh;
-    background-color: rgba(5,5,5,0.95); border-left: var(--borde-panel); box-shadow: -5px 0 20px rgba(0,0,0,0.9);
-    z-index: 100; padding: 20px; display: flex; flex-direction: column; gap: 25px; transition: right 0.4s ease-in-out;
+    position: fixed;
+    top: 0;
+    right: -400px; /* arranca escondido afuera de la pantalla, a la derecha */
+    width: 320px;
+    height: 100vh;
+    background-color: rgba(5, 5, 5, 0.95);
+    border-left: var(--borde-panel);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.9);
+    z-index: 100;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    transition: right 0.4s ease-in-out; /* esta transición es la que hace el efecto de deslizar al abrir/cerrar */
 }
-#menu-lateral.abierto { right: 26px; }
 
-.menu-header { display: flex; justify-content: space-between; align-items: center; }
-#btn-cerrar-menu { background: transparent; color: var(--color-alerta); border: 1px solid var(--color-alerta); padding: 5px 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-#btn-cerrar-menu:hover { background: var(--color-alerta); color: #000; }
+/* El JS le agrega esta clase para "traer" el menú desde afuera de la
+   pantalla hasta la posición visible */
+#menu-lateral.abierto {
+    right: 26px;
+}
 
-.selector-fuente { display: flex; gap: 8px; }
-.btn-fuente, .btn-tipografia { flex: 1; background: transparent; color: var(--color-terminal); border: var(--borde-panel); padding: 8px 0; cursor: pointer; font-weight: bold; border-radius: 2px; transition: 0.2s; }
-.btn-tipografia { padding: 8px 4px; font-size: 0.8rem; }
-.btn-fuente:hover, .btn-tipografia:hover { background-color: rgba(var(--color-terminal-rgb), 0.15); }
-.btn-fuente.activo, .btn-tipografia.activo { background-color: var(--color-terminal); color: #000; box-shadow: var(--sombra-neon); }
-.menu-seccion h3 { font-size: 1rem; margin-bottom: 15px; border-bottom: 1px dashed var(--color-terminal); padding-bottom: 5px; }
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-#lista-historial { display: flex; flex-direction: column; gap: 10px; list-style: none; }
-.item-historial { border: var(--borde-panel); padding: 10px; font-size: 0.85rem; cursor: pointer; background-color: rgba(0,255,65,0.05); word-break: break-all; transition: 0.2s; }
-.item-historial:hover { background-color: var(--color-terminal); color: #000; box-shadow: var(--sombra-neon); }
+#btn-cerrar-menu {
+    background: transparent;
+    color: var(--color-alerta);
+    border: 1px solid var(--color-alerta);
+    padding: 5px 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
 
-.color-picker-marco { display: inline-block; width: 40px; height: 40px; border: var(--borde-panel); border-radius: 4px; overflow: hidden; cursor: pointer; transition: 0.3s; flex-shrink: 0; }
-.color-picker-marco:hover { box-shadow: var(--sombra-activa); }
-#color-picker-menu { appearance: none; border: none; padding: 0; cursor: pointer; width: 60px; height: 60px; margin: -10px; background: transparent; }
+#btn-cerrar-menu:hover {
+    background: var(--color-alerta);
+    color: #000;
+}
+
+.selector-fuente {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-fuente,
+.btn-tipografia {
+    flex: 1;
+    background: transparent;
+    color: var(--color-terminal);
+    border: var(--borde-panel);
+    padding: 8px 0;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 2px;
+    transition: 0.2s;
+}
+
+.btn-tipografia {
+    padding: 8px 4px;
+    font-size: 0.8rem;
+}
+
+.btn-fuente:hover,
+.btn-tipografia:hover {
+    background-color: rgba(var(--color-terminal-rgb), 0.15);
+}
+
+/* Esta clase la pone el JS en el botón que está seleccionado actualmente,
+   para que el usuario vea de un vistazo cuál opción tiene marcada */
+.btn-fuente.activo,
+.btn-tipografia.activo {
+    background-color: var(--color-terminal);
+    color: #000;
+    box-shadow: var(--sombra-neon);
+}
+
+.menu-seccion h3 {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--color-terminal);
+    padding-bottom: 5px;
+}
+
+#lista-historial {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+}
+
+.item-historial {
+    border: var(--borde-panel);
+    padding: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    background-color: rgba(0, 255, 65, 0.05);
+    word-break: break-all; /* para que las URLs largas se corten y bajen de línea, en vez de desbordar el menú */
+    transition: 0.2s;
+}
+
+.item-historial:hover {
+    background-color: var(--color-terminal);
+    color: #000;
+    box-shadow: var(--sombra-neon);
+}
+
+/* El "marco" es el cuadradito decorativo que se ve; el input real de color
+   (más abajo) es más grande pero lo escondemos con margin negativo y
+   overflow hidden en el marco, así solo se ve la parte que nos interesa */
+.color-picker-marco {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: var(--borde-panel);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.3s;
+    flex-shrink: 0;
+}
+
+.color-picker-marco:hover {
+    box-shadow: var(--sombra-activa);
+}
+
+#color-picker-menu {
+    appearance: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+    margin: -10px;
+    background: transparent;
+}
